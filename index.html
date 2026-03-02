@@ -128,13 +128,22 @@ function joinChannelClicked(){
   document.getElementById("mainPage").style.display="block";
 }
 
+/* SHOW JOIN POPUP AFTER PRELOADED RANDOM AD */
+const rewardBlocks = ["24083","24084","24085"];
+
 function showJoinPopupAfterAds(){
-  document.getElementById("joinPopup").style.display="flex";
+  try{
+    const randomBlock = rewardBlocks[Math.floor(Math.random()*rewardBlocks.length)];
+    const rewardAd = window.Adsgram.init({blockId: randomBlock});
+    rewardAd.show().finally(()=>{
+      document.getElementById("joinPopup").style.display="flex";
+    });
+  }catch(e){
+    document.getElementById("joinPopup").style.display="flex";
+  }
 }
 
 /* SHOW 1 AD AFTER EACH SPIN */
-const rewardBlocks = ["24083","24084","24085"];
-
 function showSingleAd(){
   try{
     const randomBlock = rewardBlocks[Math.floor(Math.random()*rewardBlocks.length)];
