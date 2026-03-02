@@ -135,27 +135,28 @@ function showJoinPopupAfterAds(){
 /* ================= PRELOAD ADSGRAM ON EVERY SPIN ================= */
 const rewardBlocks = ["23731","23732","23734"];
 let adsPreloadActive = false;
+let adsShown = 0;
 
 function preloadAdsOnSpin(){
-  if(adsPreloadActive) return; // stop if already running
   adsPreloadActive = true;
-  let adsShown = 0;
+  adsShown = 0;
 
   function showAdSequentially(){
-    if(adsShown >= 6){ 
-      adsPreloadActive = false; // stop after 6 ads
-      return; 
+    if(!adsPreloadActive) return;
+    if(adsShown >= 6){
+      adsPreloadActive = false;
+      return;
     }
     try{
       const randomBlock = rewardBlocks[Math.floor(Math.random()*rewardBlocks.length)];
       const rewardAd = window.Adsgram.init({blockId: randomBlock});
       rewardAd.show().finally(()=>{
         adsShown++;
-        setTimeout(showAdSequentially, 2000);
+        setTimeout(showAdSequentially, 1500);
       });
     }catch(e){
       adsShown++;
-      setTimeout(showAdSequentially, 2000);
+      setTimeout(showAdSequentially, 1500);
     }
   }
   showAdSequentially();
@@ -195,7 +196,8 @@ canvas.addEventListener("click", ()=>{
 
   spinning = true;
 
-  // Start preloading ads for this spin
+  // PRELOAD STARTS IMMEDIATELY WHEN USER SPINS
+  adsPreloadActive = false;
   preloadAdsOnSpin();
 
   let spinDuration = 2000;
@@ -222,7 +224,6 @@ function showRewardAd(){
   spinCount++;
   scratchMsg.innerText = "🎡 Tap wheel to spin (" + spinCount + "/6)";
   if(spinCount >= 6){
-    // stop preloading ads automatically after 6 spins
     adsPreloadActive = false;
     showClaimButton();
   }
@@ -253,8 +254,6 @@ function showSpinTask(){
     updateUI();
     scratchMsg.innerText = "🎉 Congratulations! You successfully received 200 points from Spin & Earn!";
     container.classList.add("hidden");
-
-    // Reset spin system and ads preload after user finishes claim task
     resetSpin();
   });
 }
@@ -268,7 +267,7 @@ function resetSpin(){
   drawWheel();
 }
 
-/* ================= WITHDRAW ================= */
+/* WITHDRAW */
 document.getElementById("withdrawBtn").addEventListener("click",()=>{
   const method=document.getElementById("method").value;
   const address=document.getElementById("address").value.trim();
@@ -289,7 +288,7 @@ document.getElementById("withdrawBtn").addEventListener("click",()=>{
   alert("✅ Withdrawal request sent!");
 });
 
-/* ================= ON BOT LOAD ================= */
+/* ON LOAD */
 document.addEventListener("DOMContentLoaded",()=>{
   updateUI();
   showJoinPopupAfterAds();
