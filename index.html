@@ -101,15 +101,28 @@ canvas { border-radius: 10px; display: block; margin: 10px auto; }
 <script>
 const webApp = Telegram.WebApp;
 
-let points = Number(localStorage.getItem("points"));
-let energy = Number(localStorage.getItem("energy"));
-if (isNaN(points)) points = 0;
-if (isNaN(energy)) energy = 50;
+/* FIXED POINTS LOADING */
+let savedPoints = localStorage.getItem("points");
+let savedEnergy = localStorage.getItem("energy");
+
+let points = parseInt(savedPoints);
+let energy = parseInt(savedEnergy);
+
+if(isNaN(points) || points < 0 || points > 1000000){
+  points = 0;
+  localStorage.setItem("points", points);
+}
+
+if(isNaN(energy) || energy <= 0 || energy > 50){
+  energy = 50;
+  localStorage.setItem("energy", energy);
+}
 
 function updateUI(){
   document.getElementById("points").innerText = points;
   document.getElementById("energy").innerText = energy;
 }
+
 function saveState(){
   localStorage.setItem("points", points);
   localStorage.setItem("energy", energy);
@@ -122,7 +135,7 @@ function joinChannelClicked(){
   document.getElementById("mainPage").style.display="block";
 }
 
-/* PRELOADED ADSGRAM REWARD BLOCKS (untouched) */
+/* PRELOADED ADSGRAM REWARD BLOCKS */
 const rewardBlocks = ["24083","24084","24085"];
 const spinTaskBlocks = ["task-24086","task-24087","task-24088","task-24089"];
 
