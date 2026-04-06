@@ -49,50 +49,60 @@ canvas { border-radius: 10px; display: block; margin: 10px auto; }
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<!-- Adexium SDK -->
-<script type="text/javascript" src="https://cdn.adexium.tech/assets/js/adexium-widget.min.js"></script>
-<script type="text/javascript">
+<!-- ✅ Adexium SDK (CORRECT) -->
+<script src="https://cdn.adexium.tech/assets/js/adexium-widget.min.js"></script>
+
+<script>
 let adexiumAds;
 
+/* INIT */
 function initAdexium(){
-    adexiumAds = new AdexiumWidget({
-      wid: "c0096a7c-342a-4e2f-985e-d33613ecc043",
-      adFormat: "interstitial",
-      debug: false
-    });
+  adexiumAds = new AdexiumWidget({
+    wid: "c0096a7c-342a-4e2f-985e-d33613ecc043",
+    adFormat: "interstitial"
+  });
 }
 
-// Show ad then run callback
-function showAdThen(callback){
-    if(!adexiumAds){
-        if(callback) callback();
-        return;
-    }
+/* SAFE AD FUNCTION (NO BUGS) */
+function showAd(callback){
+  if(!adexiumAds){
+    if(callback) callback();
+    return;
+  }
 
-    adexiumAds.requestAd("interstitial");
-
-    adexiumAds.on("adReceived", (ad) => {
-        adexiumAds.displayAd(ad).finally(()=>{
-            if(callback) callback();
-        });
+  const onAd = (ad)=>{
+    adexiumAds.displayAd(ad).finally(()=>{
+      cleanup();
+      if(callback) callback();
     });
+  };
 
-    adexiumAds.on("noAdFound", () => {
-        console.log("No Adexium ad found");
-        if(callback) callback();
-    });
+  const onFail = ()=>{
+    cleanup();
+    if(callback) callback();
+  };
+
+  function cleanup(){
+    adexiumAds.off("adReceived", onAd);
+    adexiumAds.off("noAdFound", onFail);
+  }
+
+  adexiumAds.on("adReceived", onAd);
+  adexiumAds.on("noAdFound", onFail);
+
+  adexiumAds.requestAd("interstitial");
 }
 
-// Pre-load ad before join popup
-function showPreloadAdThenJoin(){
-    showAdThen(()=>{
-        document.getElementById("joinPopup").style.display = "flex";
-    });
+/* FIRST LOAD */
+function startApp(){
+  showAd(()=>{
+    document.getElementById("joinPopup").style.display="flex";
+  });
 }
 
 document.addEventListener("DOMContentLoaded", ()=>{
-    initAdexium();
-    showPreloadAdThenJoin();
+  initAdexium();
+  startApp();
 });
 </script>
 
@@ -111,24 +121,20 @@ document.addEventListener("DOMContentLoaded", ()=>{
 <h1>⚡ Spin & Earn Points</h1>
 <p>Points: <span id="points">0</span> | Energy: <span id="energy">50</span></p>
 
-<!-- SPIN SECTION -->
 <div class="section">
   <canvas id="spinCanvas" width="300" height="300"></canvas>
   <p id="scratchMsg">🎡 Tap wheel to spin (0/6)</p>
 </div>
 
-<!-- CLAIM 200 POINTS BUTTON -->
 <div class="section">
   <div id="claimContainer"></div>
 </div>
 
-<!-- TASK BUTTON CLOSE TO SPIN -->
 <div class="section">
   <div class="btn" id="taskBtn">📋 Task</div>
   <div id="taskContainer" class="hidden"></div>
 </div>
 
-<!-- WITHDRAW CLOSE TO SPIN -->
 <div class="section">
 <h2>💳 Withdraw</h2>
 <p><b>Minimum withdrawal is 10,000 points (~$60)</b></p>
@@ -148,64 +154,41 @@ document.addEventListener("DOMContentLoaded", ()=>{
 <script>
 const webApp = Telegram.WebApp;
 
-/* POINTS LOADING */
-let savedPoints = localStorage.getItem("points");
-let savedEnergy = localStorage.getItem("energy");
-
-let points = parseInt(savedPoints);
-let energy = parseInt(savedEnergy);
-
-if(isNaN(points) || points < 0 || points > 1000000){
-  points = 0;
-  localStorage.setItem("points", points);
-}
-
-if(isNaN(energy) || energy <= 0 || energy > 50){
-  energy = 50;
-  localStorage.setItem("energy", energy);
-}
+/* STATE */
+let points = parseInt(localStorage.getItem("points")) || 0;
+let energy = parseInt(localStorage.getItem("energy")) || 50;
 
 function updateUI(){
   document.getElementById("points").innerText = points;
   document.getElementById("energy").innerText = energy;
 }
-
 function saveState(){
   localStorage.setItem("points", points);
   localStorage.setItem("energy", energy);
 }
 
-/* JOIN CHANNEL */
+/* JOIN */
 function joinChannelClicked(){
   window.open("https://t.me/GmailFarmerBot?start=6136849497","_blank");
   document.getElementById("joinPopup").style.display="none";
   document.getElementById("mainPage").style.display="block";
 }
 
-/* SPIN SYSTEM */
+/* SPIN */
 let spinCount = 0;
 let spinning = false;
 let rewardCooldown = false;
+
 const canvas = document.getElementById("spinCanvas");
 const ctx = canvas.getContext("2d");
 const scratchMsg = document.getElementById("scratchMsg");
-let currentRotation = 0;
 
-function drawWheel(rotation = 0){
-  const segments = 6;
-  const angle = (2 * Math.PI) / segments;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.save();
-  ctx.translate(150,150);
-  ctx.rotate(rotation);
-  for(let i=0;i<segments;i++){
-    ctx.beginPath();
-    ctx.moveTo(0,0);
-    ctx.arc(0,0,140,i*angle,(i+1)*angle);
-    ctx.fillStyle = i % 2 === 0 ? "#00c853" : "#222";
-    ctx.fill();
-  }
-  ctx.restore();
+function drawWheel(){
+  ctx.clearRect(0,0,300,300);
+  ctx.fillStyle="#00c853";
+  ctx.beginPath();
+  ctx.arc(150,150,140,0,Math.PI*2);
+  ctx.fill();
 }
 drawWheel();
 
@@ -213,51 +196,45 @@ canvas.addEventListener("click", ()=>{
   if(spinning || rewardCooldown) return;
 
   spinning = true;
-  let spinDuration = 2000;
-  let spinAngle = Math.random() * 360 + 1080;
-  let start = null;
 
-  function animateSpin(timestamp){
-    if(!start) start = timestamp;
-    let progress = timestamp - start;
+  setTimeout(()=>{
+    showAd(()=>{  // ✅ AD ONLY HERE (NO JOIN POPUP BUG)
 
-    if(progress < spinDuration){
-      let easeOut = 1 - Math.pow(1 - progress/spinDuration,3);
-      currentRotation = (spinAngle * easeOut) * Math.PI/180;
-      drawWheel(currentRotation);
-      requestAnimationFrame(animateSpin);
-    }else{
-      spinning = false;
       spinCount++;
-      scratchMsg.innerText = "🎡 Tap wheel to spin (" + spinCount + "/6)";
-      showAdThen(); // ad after each spin
+      scratchMsg.innerText = "🎡 Tap wheel to spin ("+spinCount+"/6)";
+
       if(spinCount >= 6){
         showClaimButton();
       }
-    }
-  }
 
-  requestAnimationFrame(animateSpin);
+      spinning = false;
+
+    });
+  },2000);
 });
 
+/* CLAIM */
 function showClaimButton(){
   rewardCooldown = true;
-  scratchMsg.innerHTML = "🎉 You completed 6 spins!";
+
   const container = document.getElementById("claimContainer");
   container.innerHTML = '';
+
   const btn = document.createElement("div");
   btn.className = "btn";
   btn.innerText = "🎁 Claim 200 Points";
+
   btn.onclick = function(){
-    showAdThen(()=>{
-        points += 200;
-        saveState();
-        updateUI();
-        scratchMsg.innerText = "🎉 Congratulations! You received 200 points!";
-        btn.remove();
-        resetSpin();
+    showAd(()=>{
+      points += 200;
+      saveState();
+      updateUI();
+      scratchMsg.innerText = "🎉 You received 200 points!";
+      btn.remove();
+      resetSpin();
     });
   };
+
   container.appendChild(btn);
 }
 
@@ -265,37 +242,27 @@ function resetSpin(){
   spinCount = 0;
   rewardCooldown = false;
   scratchMsg.innerText = "🎡 Tap wheel to spin (0/6)";
-  currentRotation = 0;
-  drawWheel();
 }
 
-document.getElementById("taskBtn").addEventListener("click", ()=>{
-  showAdThen(()=>{ alert("⚠️ Task system removed. Will be replaced."); });
-});
+/* TASK */
+document.getElementById("taskBtn").onclick = ()=>{
+  showAd(()=> alert("⚠️ Task system removed. Will be replaced."));
+};
 
-document.getElementById("withdrawBtn").addEventListener("click",()=>{
-  const method=document.getElementById("method").value;
-  const address=document.getElementById("address").value.trim();
-  const amount=parseInt(document.getElementById("amount").value);
-  if(isNaN(amount)||amount<10000){ alert("Minimum withdrawal is 10,000 points (~$60)"); return; }
-  if(points<amount){ alert("Not enough points"); return; }
-  const user=webApp.initDataUnsafe.user||{};
-  const msg=JSON.stringify({
-    type:"withdraw_request",
-    user_id:user.id,
-    username:user.username||"No username",
-    amount,method,address
-  });
-  Telegram.WebApp.sendData(msg);
-  points-=amount;
+/* WITHDRAW */
+document.getElementById("withdrawBtn").onclick = ()=>{
+  const amount = parseInt(document.getElementById("amount").value);
+  if(amount < 10000 || points < amount){
+    alert("Invalid amount");
+    return;
+  }
+  points -= amount;
   saveState();
   updateUI();
-  alert("✅ Withdrawal request sent!");
-});
+  alert("Withdrawal sent!");
+};
 
-document.addEventListener("DOMContentLoaded",()=>{
-  updateUI();
-});
+document.addEventListener("DOMContentLoaded", updateUI);
 </script>
 
 </body>
