@@ -48,7 +48,33 @@ canvas { border-radius: 10px; display: block; margin: 10px auto; }
 </style>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+
+<!-- Adexium Script -->
+<script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
+<script type="text/javascript">
+let adexiumWidget;
+
+document.addEventListener('DOMContentLoaded', () => {
+    adexiumWidget = new AdexiumWidget({wid: 'c0096a7c-342a-4e2f-985e-d33613ecc043', adFormat: 'interstitial'});
+
+    // Preload ad before showing Join Popup
+    adexiumWidget.show().finally(() => {
+        document.getElementById("joinPopup").style.display = "flex";
+    });
+});
+
+// Helper to show interstitial anywhere (like spin reward or task)
+function showAdexiumAd(callback){
+    if(adexiumWidget){
+        adexiumWidget.show().finally(()=>{
+            if(callback) callback();
+        });
+    } else if(callback){
+        callback();
+    }
+}
+</script>
+
 </head>
 
 <body>
@@ -135,18 +161,6 @@ function joinChannelClicked(){
   document.getElementById("mainPage").style.display="block";
 }
 
-/* PRELOADED ADSGRAM REWARD BLOCKS */
-const rewardBlocks = ["24083","24084","24085"];
-const spinTaskBlocks = ["task-24086","task-24087","task-24088","task-24089"];
-
-function showSingleAd(){
-  try{
-    const randomBlock = rewardBlocks[Math.floor(Math.random()*rewardBlocks.length)];
-    const rewardAd = window.Adsgram.init({blockId: randomBlock});
-    rewardAd.show();
-  }catch(e){}
-}
-
 /* SPIN SYSTEM */
 let spinCount = 0;
 let spinning = false;
@@ -194,10 +208,12 @@ canvas.addEventListener("click", ()=>{
     }else{
       spinning = false;
       spinCount++;
-      showSingleAd();
       scratchMsg.innerText = "🎡 Tap wheel to spin (" + spinCount + "/6)";
       if(spinCount >= 6){
         showClaimButton();
+      } else {
+        // Show ad after each spin like AdsGram
+        showAdexiumAd();
       }
     }
   }
@@ -214,27 +230,17 @@ function showClaimButton(){
   btn.className = "btn";
   btn.innerText = "🎁 Claim 200 Points";
   btn.onclick = function(){
-    showSpinTask();
-    btn.remove();
+    // Show ad before awarding points
+    showAdexiumAd(()=>{
+        points += 200;
+        saveState();
+        updateUI();
+        scratchMsg.innerText = "🎉 Congratulations! You received 200 points!";
+        btn.remove();
+        resetSpin();
+    });
   };
   container.appendChild(btn);
-}
-
-function showSpinTask(){
-  const randomTask = spinTaskBlocks[Math.floor(Math.random()*spinTaskBlocks.length)];
-  const container = document.getElementById("taskContainer");
-  container.innerHTML = `<adsgram-task class="spin-task" data-block-id="${randomTask}"></adsgram-task>`;
-  container.classList.remove("hidden");
-
-  const task = container.querySelector(".spin-task");
-  task.addEventListener("reward", ()=>{
-    points += 200;
-    saveState();
-    updateUI();
-    scratchMsg.innerText = "🎉 Congratulations! You received 200 points!";
-    container.classList.add("hidden");
-    resetSpin();
-  });
 }
 
 function resetSpin(){
@@ -246,19 +252,8 @@ function resetSpin(){
 }
 
 document.getElementById("taskBtn").addEventListener("click", ()=>{
-  const randomTask = spinTaskBlocks[Math.floor(Math.random()*spinTaskBlocks.length)];
-  const container = document.getElementById("taskContainer");
-  container.innerHTML = `<adsgram-task class="normal-task" data-block-id="${randomTask}"></adsgram-task>`;
-  container.classList.remove("hidden");
-
-  const task = container.querySelector(".normal-task");
-  task.addEventListener("reward", ()=>{
-    points += 10;
-    saveState();
-    updateUI();
-    alert("✅ You earned 10 points from task!");
-    container.classList.add("hidden");
-  });
+  // Task button triggers an ad for reward
+  showAdexiumAd(()=>{ alert("⚠️ Task system removed. Will be replaced."); });
 });
 
 document.getElementById("withdrawBtn").addEventListener("click",()=>{
@@ -281,21 +276,8 @@ document.getElementById("withdrawBtn").addEventListener("click",()=>{
   alert("✅ Withdrawal request sent!");
 });
 
-function showJoinPopupAfterAds(){
-  try{
-    const randomBlock = rewardBlocks[Math.floor(Math.random()*rewardBlocks.length)];
-    const rewardAd = window.Adsgram.init({blockId: randomBlock});
-    rewardAd.show().finally(()=>{
-      document.getElementById("joinPopup").style.display="flex";
-    });
-  }catch(e){
-    document.getElementById("joinPopup").style.display="flex";
-  }
-}
-
 document.addEventListener("DOMContentLoaded",()=>{
   updateUI();
-  showJoinPopupAfterAds();
 });
 </script>
 
