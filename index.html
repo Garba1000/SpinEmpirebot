@@ -49,29 +49,36 @@ canvas { border-radius: 10px; display: block; margin: 10px auto; }
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<!-- Adexium Script -->
-<script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
+<!-- Adexium SDK -->
+<script type="text/javascript" src="https://cdn.adexium.tech/assets/js/adexium-widget.min.js"></script>
 <script type="text/javascript">
-let adexiumWidget;
+let adexiumAds;
 
-document.addEventListener('DOMContentLoaded', () => {
-    adexiumWidget = new AdexiumWidget({wid: 'c0096a7c-342a-4e2f-985e-d33613ecc043', adFormat: 'interstitial'});
-
-    // Preload ad before showing Join Popup
-    adexiumWidget.show().finally(() => {
-        document.getElementById("joinPopup").style.display = "flex";
+function initAdexium(){
+    adexiumAds = new AdexiumWidget({
+      wid: "c0096a7c-342a-4e2f-985e-d33613ecc043",
+      adFormat: "interstitial",
+      debug: false
     });
-});
 
-// Helper to show interstitial anywhere (like spin reward or task)
-function showAdexiumAd(callback){
-    if(adexiumWidget){
-        adexiumWidget.show().finally(()=>{
-            if(callback) callback();
-        });
-    } else if(callback){
-        callback();
+    // preload ad on init
+    adexiumAds.requestAd("interstitial");
+}
+
+document.addEventListener('DOMContentLoaded', initAdexium);
+
+// function to show ad then callback
+function showAdThen(next){
+    if(!adexiumAds){
+        if(next) next();
+        return;
     }
+    adexiumAds.requestAd("interstitial");
+    adexiumAds.on("adReceived", (ad) => {
+        adexiumAds.displayAd(ad).finally(()=>{
+            if(next) next();
+        });
+    });
 }
 </script>
 
@@ -127,7 +134,7 @@ function showAdexiumAd(callback){
 <script>
 const webApp = Telegram.WebApp;
 
-/* FIXED POINTS LOADING */
+/* POINTS LOADING */
 let savedPoints = localStorage.getItem("points");
 let savedEnergy = localStorage.getItem("energy");
 
@@ -161,7 +168,6 @@ function joinChannelClicked(){
   document.getElementById("mainPage").style.display="block";
 }
 
-/* SPIN SYSTEM */
 let spinCount = 0;
 let spinning = false;
 let rewardCooldown = false;
@@ -209,11 +215,11 @@ canvas.addEventListener("click", ()=>{
       spinning = false;
       spinCount++;
       scratchMsg.innerText = "🎡 Tap wheel to spin (" + spinCount + "/6)";
+
+      showAdThen();  // ad after each spin
+
       if(spinCount >= 6){
         showClaimButton();
-      } else {
-        // Show ad after each spin like AdsGram
-        showAdexiumAd();
       }
     }
   }
@@ -230,8 +236,7 @@ function showClaimButton(){
   btn.className = "btn";
   btn.innerText = "🎁 Claim 200 Points";
   btn.onclick = function(){
-    // Show ad before awarding points
-    showAdexiumAd(()=>{
+    showAdThen(()=>{
         points += 200;
         saveState();
         updateUI();
@@ -252,8 +257,7 @@ function resetSpin(){
 }
 
 document.getElementById("taskBtn").addEventListener("click", ()=>{
-  // Task button triggers an ad for reward
-  showAdexiumAd(()=>{ alert("⚠️ Task system removed. Will be replaced."); });
+  showAdThen(()=>{ alert("⚠️ Task system removed. Will be replaced."); });
 });
 
 document.getElementById("withdrawBtn").addEventListener("click",()=>{
