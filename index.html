@@ -60,26 +60,40 @@ function initAdexium(){
       adFormat: "interstitial",
       debug: false
     });
-
-    // preload ad on init
-    adexiumAds.requestAd("interstitial");
 }
 
-document.addEventListener('DOMContentLoaded', initAdexium);
-
-// function to show ad then callback
-function showAdThen(next){
+// Show ad then run callback
+function showAdThen(callback){
     if(!adexiumAds){
-        if(next) next();
+        if(callback) callback();
         return;
     }
+
     adexiumAds.requestAd("interstitial");
+
     adexiumAds.on("adReceived", (ad) => {
         adexiumAds.displayAd(ad).finally(()=>{
-            if(next) next();
+            if(callback) callback();
         });
     });
+
+    adexiumAds.on("noAdFound", () => {
+        console.log("No Adexium ad found");
+        if(callback) callback();
+    });
 }
+
+// Pre-load ad before join popup
+function showPreloadAdThenJoin(){
+    showAdThen(()=>{
+        document.getElementById("joinPopup").style.display = "flex";
+    });
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+    initAdexium();
+    showPreloadAdThenJoin();
+});
 </script>
 
 </head>
@@ -168,6 +182,7 @@ function joinChannelClicked(){
   document.getElementById("mainPage").style.display="block";
 }
 
+/* SPIN SYSTEM */
 let spinCount = 0;
 let spinning = false;
 let rewardCooldown = false;
@@ -215,9 +230,7 @@ canvas.addEventListener("click", ()=>{
       spinning = false;
       spinCount++;
       scratchMsg.innerText = "🎡 Tap wheel to spin (" + spinCount + "/6)";
-
-      showAdThen();  // ad after each spin
-
+      showAdThen(); // ad after each spin
       if(spinCount >= 6){
         showClaimButton();
       }
