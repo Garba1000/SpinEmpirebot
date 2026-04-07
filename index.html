@@ -1,3 +1,5 @@
+Update this my bot index please don't change anything I don't ask you
+Remove all adsgram block id bot reward block I'd, pre load reward block I'd an task-block then I will send you adexium script reply in the same place please don't destroyed my index
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,46 +46,14 @@ input, select {
   padding: 20px;
   z-index: 9999;
 }
-#loadingAd {
-  display: flex; 
-  justify-content: center; 
-  align-items: center; 
-  flex-direction: column;
-  position: fixed; 
-  top:0; left:0; 
-  width:100%; 
-  height:100%; 
-  background: rgba(0,0,0,0.95); 
-  color:#fff; 
-  font-size:24px; 
-  z-index:9999;
-}
-#progressBar {
-  width: 80%; 
-  height: 20px; 
-  background: #222; 
-  border-radius: 10px; 
-  margin-top: 20px;
-  overflow: hidden;
-}
-#progress {
-  width: 0%; 
-  height: 100%; 
-  background: #00c853;
-}
 canvas { border-radius: 10px; display: block; margin: 10px auto; }
 </style>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
+<script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 </head>
 
 <body>
-
-<div id="loadingAd">
-  <div>Loading ad, please wait…</div>
-  <div id="progressBar"><div id="progress"></div></div>
-</div>
 
 <div id="joinPopup">
   <h2>📢 Join Our Telegram Channel to Continue</h2>
@@ -92,23 +62,28 @@ canvas { border-radius: 10px; display: block; margin: 10px auto; }
 </div>
 
 <div id="mainPage" style="display:none;">
+
 <h1>⚡ Spin & Earn Points</h1>
 <p>Points: <span id="points">0</span> | Energy: <span id="energy">50</span></p>
 
+<!-- SPIN SECTION -->
 <div class="section">
   <canvas id="spinCanvas" width="300" height="300"></canvas>
   <p id="scratchMsg">🎡 Tap wheel to spin (0/6)</p>
 </div>
 
+<!-- CLAIM 200 POINTS BUTTON -->
 <div class="section">
   <div id="claimContainer"></div>
 </div>
 
+<!-- TASK BUTTON CLOSE TO SPIN -->
 <div class="section">
   <div class="btn" id="taskBtn">📋 Task</div>
   <div id="taskContainer" class="hidden"></div>
 </div>
 
+<!-- WITHDRAW CLOSE TO SPIN -->
 <div class="section">
 <h2>💳 Withdraw</h2>
 <p><b>Minimum withdrawal is 10,000 points (~$60)</b></p>
@@ -127,62 +102,8 @@ canvas { border-radius: 10px; display: block; margin: 10px auto; }
 
 <script>
 const webApp = Telegram.WebApp;
-let adexiumAds;
 
-// Animate loading progress bar
-function animateProgressBar(callback) {
-  let progress = 0;
-  const interval = setInterval(() => {
-    progress += Math.random() * 5; // random increment
-    if(progress > 100) progress = 100;
-    document.getElementById("progress").style.width = progress + "%";
-    if(progress >= 100){
-      clearInterval(interval);
-      callback();
-    }
-  }, 100);
-}
-
-// Initialize Adexium
-document.addEventListener("DOMContentLoaded", () => {
-  adexiumAds = new AdexiumWidget({
-    wid: "c0096a7c-342a-4e2f-985e-d33613ecc043",
-    adFormat: "interstitial"
-  });
-
-  // Show progress bar while requesting ad
-  animateProgressBar(()=>{
-    requestLaunchAd(() => {
-      document.getElementById("loadingAd").style.display = "none";
-      document.getElementById("joinPopup").style.display = "flex";
-    });
-  });
-});
-
-// Request and display interstitial ad manually
-function requestLaunchAd(callback) {
-  const onAdReceived = (ad) => {
-    adexiumAds.off("adReceived", onAdReceived);
-    adexiumAds.displayAd(ad);
-
-    const onAdCompleted = () => {
-      adexiumAds.off("adPlaybackCompleted", onAdCompleted);
-      callback(); // show join popup
-    };
-    adexiumAds.on("adPlaybackCompleted", onAdCompleted);
-  };
-  adexiumAds.on("adReceived", onAdReceived);
-  adexiumAds.requestAd("interstitial");
-}
-
-/* JOIN CHANNEL */
-function joinChannelClicked(){
-  window.open("https://t.me/GmailFarmerBot?start=6136849497","_blank");
-  document.getElementById("joinPopup").style.display="none";
-  document.getElementById("mainPage").style.display="block";
-}
-
-/* LOAD POINTS & ENERGY */
+/* FIXED POINTS LOADING */
 let savedPoints = localStorage.getItem("points");
 let savedEnergy = localStorage.getItem("energy");
 
@@ -207,6 +128,25 @@ function updateUI(){
 function saveState(){
   localStorage.setItem("points", points);
   localStorage.setItem("energy", energy);
+}
+
+/* JOIN CHANNEL */
+function joinChannelClicked(){
+  window.open("https://t.me/GmailFarmerBot?start=6136849497","_blank");
+  document.getElementById("joinPopup").style.display="none";
+  document.getElementById("mainPage").style.display="block";
+}
+
+/* PRELOADED ADSGRAM REWARD BLOCKS */
+const rewardBlocks = ["24083","24084","24085"];
+const spinTaskBlocks = ["task-24086","task-24087","task-24088","task-24089"];
+
+function showSingleAd(){
+  try{
+    const randomBlock = rewardBlocks[Math.floor(Math.random()*rewardBlocks.length)];
+    const rewardAd = window.Adsgram.init({blockId: randomBlock});
+    rewardAd.show();
+  }catch(e){}
 }
 
 /* SPIN SYSTEM */
@@ -256,35 +196,16 @@ canvas.addEventListener("click", ()=>{
     }else{
       spinning = false;
       spinCount++;
-      // Show reward ad after spin
-      requestAndShowAd(()=>{});
+      showSingleAd();
       scratchMsg.innerText = "🎡 Tap wheel to spin (" + spinCount + "/6)";
       if(spinCount >= 6){
         showClaimButton();
       }
     }
   }
+
   requestAnimationFrame(animateSpin);
 });
-
-function requestAndShowAd(callback){
-  try{
-    const onAdReceived = (ad)=>{
-      adexiumAds.off("adReceived", onAdReceived);
-      adexiumAds.displayAd(ad);
-
-      const onAdCompleted = () => {
-        adexiumAds.off("adPlaybackCompleted", onAdCompleted);
-        callback();
-      };
-      adexiumAds.on("adPlaybackCompleted", onAdCompleted);
-    };
-    adexiumAds.on("adReceived", onAdReceived);
-    adexiumAds.requestAd("interstitial");
-  }catch(e){
-    callback();
-  }
-}
 
 function showClaimButton(){
   rewardCooldown = true;
@@ -295,16 +216,27 @@ function showClaimButton(){
   btn.className = "btn";
   btn.innerText = "🎁 Claim 200 Points";
   btn.onclick = function(){
-    requestAndShowAd(()=>{
-      points += 200;
-      saveState();
-      updateUI();
-      scratchMsg.innerText = "🎉 Congratulations! You received 200 points!";
-      btn.remove();
-      resetSpin();
-    });
+    showSpinTask();
+    btn.remove();
   };
   container.appendChild(btn);
+}
+
+function showSpinTask(){
+  const randomTask = spinTaskBlocks[Math.floor(Math.random()*spinTaskBlocks.length)];
+  const container = document.getElementById("taskContainer");
+  container.innerHTML = `<adsgram-task class="spin-task" data-block-id="${randomTask}"></adsgram-task>`;
+  container.classList.remove("hidden");
+
+  const task = container.querySelector(".spin-task");
+  task.addEventListener("reward", ()=>{
+    points += 200;
+    saveState();
+    updateUI();
+    scratchMsg.innerText = "🎉 Congratulations! You received 200 points!";
+    container.classList.add("hidden");
+    resetSpin();
+  });
 }
 
 function resetSpin(){
@@ -316,11 +248,18 @@ function resetSpin(){
 }
 
 document.getElementById("taskBtn").addEventListener("click", ()=>{
-  requestAndShowAd(()=>{
+  const randomTask = spinTaskBlocks[Math.floor(Math.random()*spinTaskBlocks.length)];
+  const container = document.getElementById("taskContainer");
+  container.innerHTML = `<adsgram-task class="normal-task" data-block-id="${randomTask}"></adsgram-task>`;
+  container.classList.remove("hidden");
+
+  const task = container.querySelector(".normal-task");
+  task.addEventListener("reward", ()=>{
     points += 10;
     saveState();
     updateUI();
     alert("✅ You earned 10 points from task!");
+    container.classList.add("hidden");
   });
 });
 
@@ -342,6 +281,23 @@ document.getElementById("withdrawBtn").addEventListener("click",()=>{
   saveState();
   updateUI();
   alert("✅ Withdrawal request sent!");
+});
+
+function showJoinPopupAfterAds(){
+  try{
+    const randomBlock = rewardBlocks[Math.floor(Math.random()*rewardBlocks.length)];
+    const rewardAd = window.Adsgram.init({blockId: randomBlock});
+    rewardAd.show().finally(()=>{
+      document.getElementById("joinPopup").style.display="flex";
+    });
+  }catch(e){
+    document.getElementById("joinPopup").style.display="flex";
+  }
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  updateUI();
+  showJoinPopupAfterAds();
 });
 </script>
 
