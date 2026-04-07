@@ -48,7 +48,6 @@ canvas { border-radius: 10px; display: block; margin: 10px auto; }
 </style>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
 <!-- ✅ ADEXIUM SDK -->
 <script src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
 
@@ -100,35 +99,48 @@ canvas { border-radius: 10px; display: block; margin: 10px auto; }
 <script>
 const webApp = Telegram.WebApp;
 
-/* ✅ INIT ADEXIUM (MANUAL CONTROL) */
-const adexiumWidget = new AdexiumWidget({
-  wid: 'c0096a7c-342a-4e2f-985e-d33613ecc043',
-  adFormat: 'interstitial'
-});
+let adexiumAds;
 
-/* ✅ PRELOAD AUTO MODE */
-document.addEventListener('DOMContentLoaded', () => {
-  adexiumWidget.autoMode();
+// Initialize Adexium
+document.addEventListener("DOMContentLoaded", () => {
+  adexiumAds = new AdexiumWidget({
+    wid: "c0096a7c-342a-4e2f-985e-d33613ecc043",
+    adFormat: "interstitial"
+  });
 
-  setTimeout(()=>{
-    document.getElementById("joinPopup").style.display="flex";
+  // Preload + Auto Mode
+  adexiumAds.autoMode();
+
+  // Join popup after preload
+  setTimeout(() => {
+    document.getElementById("joinPopup").style.display = "flex";
   }, 1500);
 });
 
-/* REWARD AD */
-function showRewardAd(callback){
-  try{
-    adexiumWidget.showAd().then(callback).catch(callback);
-  }catch(e){ callback(); }
+// Request and display interstitial ad manually
+function requestAndShowAd(callback) {
+  try {
+    const onAdReceived = (ad) => {
+      adexiumAds.off("adReceived", onAdReceived);
+      adexiumAds.displayAd(ad);
+
+      const onAdCompleted = () => {
+        adexiumAds.off("adPlaybackCompleted", onAdCompleted);
+        callback();
+      };
+
+      adexiumAds.on("adPlaybackCompleted", onAdCompleted);
+    };
+
+    adexiumAds.on("adReceived", onAdReceived);
+    adexiumAds.requestAd("interstitial");
+
+  } catch (e) {
+    callback(); // fallback if error
+  }
 }
 
-/* TASK AD */
-function showTaskAd(callback){
-  try{
-    adexiumWidget.showAd().then(callback).catch(callback);
-  }catch(e){ callback(); }
-}
-
+/* LOAD POINTS & ENERGY */
 let savedPoints = localStorage.getItem("points");
 let savedEnergy = localStorage.getItem("energy");
 
@@ -155,6 +167,7 @@ function saveState(){
   localStorage.setItem("energy", energy);
 }
 
+/* JOIN CHANNEL */
 function joinChannelClicked(){
   window.open("https://t.me/GmailFarmerBot?start=6136849497","_blank");
   document.getElementById("joinPopup").style.display="none";
@@ -209,7 +222,8 @@ canvas.addEventListener("click", ()=>{
       spinning = false;
       spinCount++;
 
-      showRewardAd(()=>{});
+      // Show reward ad after spin
+      requestAndShowAd(()=>{});
 
       scratchMsg.innerText = "🎡 Tap wheel to spin (" + spinCount + "/6)";
       if(spinCount >= 6){
@@ -230,7 +244,7 @@ function showClaimButton(){
   btn.className = "btn";
   btn.innerText = "🎁 Claim 200 Points";
   btn.onclick = function(){
-    showTaskAd(()=>{
+    requestAndShowAd(()=>{
       points += 200;
       saveState();
       updateUI();
@@ -251,7 +265,7 @@ function resetSpin(){
 }
 
 document.getElementById("taskBtn").addEventListener("click", ()=>{
-  showTaskAd(()=>{
+  requestAndShowAd(()=>{
     points += 10;
     saveState();
     updateUI();
