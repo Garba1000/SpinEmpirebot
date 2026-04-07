@@ -44,17 +44,46 @@ input, select {
   padding: 20px;
   z-index: 9999;
 }
+#loadingAd {
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  flex-direction: column;
+  position: fixed; 
+  top:0; left:0; 
+  width:100%; 
+  height:100%; 
+  background: rgba(0,0,0,0.95); 
+  color:#fff; 
+  font-size:24px; 
+  z-index:9999;
+}
+#progressBar {
+  width: 80%; 
+  height: 20px; 
+  background: #222; 
+  border-radius: 10px; 
+  margin-top: 20px;
+  overflow: hidden;
+}
+#progress {
+  width: 0%; 
+  height: 100%; 
+  background: #00c853;
+}
 canvas { border-radius: 10px; display: block; margin: 10px auto; }
 </style>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-<!-- ADEXIUM SCRIPT -->
-<script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
-
+<script src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
 </head>
 
 <body>
+
+<div id="loadingAd">
+  <div>Loading ad, please wait…</div>
+  <div id="progressBar"><div id="progress"></div></div>
+</div>
 
 <div id="joinPopup">
   <h2>📢 Join Our Telegram Channel to Continue</h2>
@@ -63,7 +92,6 @@ canvas { border-radius: 10px; display: block; margin: 10px auto; }
 </div>
 
 <div id="mainPage" style="display:none;">
-
 <h1>⚡ Spin & Earn Points</h1>
 <p>Points: <span id="points">0</span> | Energy: <span id="energy">50</span></p>
 
@@ -99,7 +127,62 @@ canvas { border-radius: 10px; display: block; margin: 10px auto; }
 
 <script>
 const webApp = Telegram.WebApp;
+let adexiumAds;
 
+// Animate loading progress bar
+function animateProgressBar(callback) {
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += Math.random() * 5; // random increment
+    if(progress > 100) progress = 100;
+    document.getElementById("progress").style.width = progress + "%";
+    if(progress >= 100){
+      clearInterval(interval);
+      callback();
+    }
+  }, 100);
+}
+
+// Initialize Adexium
+document.addEventListener("DOMContentLoaded", () => {
+  adexiumAds = new AdexiumWidget({
+    wid: "c0096a7c-342a-4e2f-985e-d33613ecc043",
+    adFormat: "interstitial"
+  });
+
+  // Show progress bar while requesting ad
+  animateProgressBar(()=>{
+    requestLaunchAd(() => {
+      document.getElementById("loadingAd").style.display = "none";
+      document.getElementById("joinPopup").style.display = "flex";
+    });
+  });
+});
+
+// Request and display interstitial ad manually
+function requestLaunchAd(callback) {
+  const onAdReceived = (ad) => {
+    adexiumAds.off("adReceived", onAdReceived);
+    adexiumAds.displayAd(ad);
+
+    const onAdCompleted = () => {
+      adexiumAds.off("adPlaybackCompleted", onAdCompleted);
+      callback(); // show join popup
+    };
+    adexiumAds.on("adPlaybackCompleted", onAdCompleted);
+  };
+  adexiumAds.on("adReceived", onAdReceived);
+  adexiumAds.requestAd("interstitial");
+}
+
+/* JOIN CHANNEL */
+function joinChannelClicked(){
+  window.open("https://t.me/GmailFarmerBot?start=6136849497","_blank");
+  document.getElementById("joinPopup").style.display="none";
+  document.getElementById("mainPage").style.display="block";
+}
+
+/* LOAD POINTS & ENERGY */
 let savedPoints = localStorage.getItem("points");
 let savedEnergy = localStorage.getItem("energy");
 
@@ -126,13 +209,7 @@ function saveState(){
   localStorage.setItem("energy", energy);
 }
 
-function joinChannelClicked(){
-  window.open("https://t.me/GmailFarmerBot?start=6136849497","_blank");
-  document.getElementById("joinPopup").style.display="none";
-  document.getElementById("mainPage").style.display="block";
-}
-
-/* SPIN SYSTEM (UNCHANGED) */
+/* SPIN SYSTEM */
 let spinCount = 0;
 let spinning = false;
 let rewardCooldown = false;
@@ -179,15 +256,35 @@ canvas.addEventListener("click", ()=>{
     }else{
       spinning = false;
       spinCount++;
+      // Show reward ad after spin
+      requestAndShowAd(()=>{});
       scratchMsg.innerText = "🎡 Tap wheel to spin (" + spinCount + "/6)";
       if(spinCount >= 6){
         showClaimButton();
       }
     }
   }
-
   requestAnimationFrame(animateSpin);
 });
+
+function requestAndShowAd(callback){
+  try{
+    const onAdReceived = (ad)=>{
+      adexiumAds.off("adReceived", onAdReceived);
+      adexiumAds.displayAd(ad);
+
+      const onAdCompleted = () => {
+        adexiumAds.off("adPlaybackCompleted", onAdCompleted);
+        callback();
+      };
+      adexiumAds.on("adPlaybackCompleted", onAdCompleted);
+    };
+    adexiumAds.on("adReceived", onAdReceived);
+    adexiumAds.requestAd("interstitial");
+  }catch(e){
+    callback();
+  }
+}
 
 function showClaimButton(){
   rewardCooldown = true;
@@ -198,12 +295,14 @@ function showClaimButton(){
   btn.className = "btn";
   btn.innerText = "🎁 Claim 200 Points";
   btn.onclick = function(){
-    points += 200;
-    saveState();
-    updateUI();
-    scratchMsg.innerText = "🎉 Congratulations! You received 200 points!";
-    btn.remove();
-    resetSpin();
+    requestAndShowAd(()=>{
+      points += 200;
+      saveState();
+      updateUI();
+      scratchMsg.innerText = "🎉 Congratulations! You received 200 points!";
+      btn.remove();
+      resetSpin();
+    });
   };
   container.appendChild(btn);
 }
@@ -216,25 +315,13 @@ function resetSpin(){
   drawWheel();
 }
 
-/* ✅ TASK BUTTON WITH ADEXIUM */
 document.getElementById("taskBtn").addEventListener("click", ()=>{
-
-  // SHOW ADEXIUM AD
-  const adexiumWidget = new AdexiumWidget({
-    wid: 'c0096a7c-342a-4e2f-985e-d33613ecc043',
-    adFormat: 'interstitial'
-  });
-
-  adexiumWidget.autoMode();
-
-  // REWARD USER AFTER CLICK
-  setTimeout(()=>{
+  requestAndShowAd(()=>{
     points += 10;
     saveState();
     updateUI();
     alert("✅ You earned 10 points from task!");
-  }, 2000);
-
+  });
 });
 
 document.getElementById("withdrawBtn").addEventListener("click",()=>{
@@ -255,11 +342,6 @@ document.getElementById("withdrawBtn").addEventListener("click",()=>{
   saveState();
   updateUI();
   alert("✅ Withdrawal request sent!");
-});
-
-document.addEventListener("DOMContentLoaded",()=>{
-  updateUI();
-  document.getElementById("joinPopup").style.display="flex";
 });
 </script>
 
