@@ -49,7 +49,7 @@ canvas { border-radius: 10px; display: block; margin: 10px auto; }
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<!-- ✅ Adexium SDK (CORRECT) -->
+<!-- Adexium SDK -->
 <script src="https://cdn.adexium.tech/assets/js/adexium-widget.min.js"></script>
 
 <script>
@@ -63,7 +63,7 @@ function initAdexium(){
   });
 }
 
-/* SAFE AD FUNCTION (NO BUGS) */
+/* SAFE AD FUNCTION */
 function showAd(callback){
   if(!adexiumAds){
     if(callback) callback();
@@ -93,11 +93,48 @@ function showAd(callback){
   adexiumAds.requestAd("interstitial");
 }
 
-/* FIRST LOAD */
+/* 🔥 FIXED PRELOAD FLOW (NO BLACK SCREEN) */
 function startApp(){
-  showAd(()=>{
-    document.getElementById("joinPopup").style.display="flex";
-  });
+
+  let finished = false;
+
+  function showJoin(){
+    if(finished) return;
+    finished = true;
+    document.getElementById("joinPopup").style.display = "flex";
+  }
+
+  if(!adexiumAds){
+    showJoin();
+    return;
+  }
+
+  const onAd = (ad)=>{
+    adexiumAds.displayAd(ad).finally(()=>{
+      cleanup();
+      showJoin();
+    });
+  };
+
+  const onFail = ()=>{
+    cleanup();
+    showJoin();
+  };
+
+  function cleanup(){
+    adexiumAds.off("adReceived", onAd);
+    adexiumAds.off("noAdFound", onFail);
+  }
+
+  adexiumAds.on("adReceived", onAd);
+  adexiumAds.on("noAdFound", onFail);
+
+  adexiumAds.requestAd("interstitial");
+
+  /* 🔥 FAILSAFE (IMPORTANT) */
+  setTimeout(()=>{
+    showJoin();
+  }, 5000);
 }
 
 document.addEventListener("DOMContentLoaded", ()=>{
@@ -154,7 +191,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
 <script>
 const webApp = Telegram.WebApp;
 
-/* STATE */
 let points = parseInt(localStorage.getItem("points")) || 0;
 let energy = parseInt(localStorage.getItem("energy")) || 50;
 
@@ -198,8 +234,7 @@ canvas.addEventListener("click", ()=>{
   spinning = true;
 
   setTimeout(()=>{
-    showAd(()=>{  // ✅ AD ONLY HERE (NO JOIN POPUP BUG)
-
+    showAd(()=>{
       spinCount++;
       scratchMsg.innerText = "🎡 Tap wheel to spin ("+spinCount+"/6)";
 
@@ -208,7 +243,6 @@ canvas.addEventListener("click", ()=>{
       }
 
       spinning = false;
-
     });
   },2000);
 });
