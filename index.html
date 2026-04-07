@@ -49,99 +49,8 @@ canvas { border-radius: 10px; display: block; margin: 10px auto; }
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<!-- Adexium SDK -->
-<script src="https://cdn.adexium.tech/assets/js/adexium-widget.min.js"></script>
-
-<script>
-let adexiumAds;
-
-/* INIT */
-function initAdexium(){
-  adexiumAds = new AdexiumWidget({
-    wid: "c0096a7c-342a-4e2f-985e-d33613ecc043",
-    adFormat: "interstitial"
-  });
-}
-
-/* SAFE AD FUNCTION */
-function showAd(callback){
-  if(!adexiumAds){
-    if(callback) callback();
-    return;
-  }
-
-  const onAd = (ad)=>{
-    adexiumAds.displayAd(ad).finally(()=>{
-      cleanup();
-      if(callback) callback();
-    });
-  };
-
-  const onFail = ()=>{
-    cleanup();
-    if(callback) callback();
-  };
-
-  function cleanup(){
-    adexiumAds.off("adReceived", onAd);
-    adexiumAds.off("noAdFound", onFail);
-  }
-
-  adexiumAds.on("adReceived", onAd);
-  adexiumAds.on("noAdFound", onFail);
-
-  adexiumAds.requestAd("interstitial");
-}
-
-/* 🔥 FIXED PRELOAD FLOW (NO BLACK SCREEN) */
-function startApp(){
-
-  let finished = false;
-
-  function showJoin(){
-    if(finished) return;
-    finished = true;
-    document.getElementById("joinPopup").style.display = "flex";
-  }
-
-  if(!adexiumAds){
-    showJoin();
-    return;
-  }
-
-  const onAd = (ad)=>{
-    adexiumAds.displayAd(ad).finally(()=>{
-      cleanup();
-      showJoin();
-    });
-  };
-
-  const onFail = ()=>{
-    cleanup();
-    showJoin();
-  };
-
-  function cleanup(){
-    adexiumAds.off("adReceived", onAd);
-    adexiumAds.off("noAdFound", onFail);
-  }
-
-  adexiumAds.on("adReceived", onAd);
-  adexiumAds.on("noAdFound", onFail);
-
-  adexiumAds.requestAd("interstitial");
-
-  /* 🔥 FAILSAFE (IMPORTANT) */
-  setTimeout(()=>{
-    showJoin();
-  }, 5000);
-}
-
-document.addEventListener("DOMContentLoaded", ()=>{
-  initAdexium();
-  startApp();
-});
-</script>
+<!-- ✅ ADEXIUM SDK -->
+<script src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
 
 </head>
 
@@ -191,40 +100,91 @@ document.addEventListener("DOMContentLoaded", ()=>{
 <script>
 const webApp = Telegram.WebApp;
 
-let points = parseInt(localStorage.getItem("points")) || 0;
-let energy = parseInt(localStorage.getItem("energy")) || 50;
+/* ✅ INIT ADEXIUM (MANUAL CONTROL) */
+const adexiumWidget = new AdexiumWidget({
+  wid: 'c0096a7c-342a-4e2f-985e-d33613ecc043',
+  adFormat: 'interstitial'
+});
+
+/* ✅ PRELOAD AUTO MODE */
+document.addEventListener('DOMContentLoaded', () => {
+  adexiumWidget.autoMode();
+
+  setTimeout(()=>{
+    document.getElementById("joinPopup").style.display="flex";
+  }, 1500);
+});
+
+/* REWARD AD */
+function showRewardAd(callback){
+  try{
+    adexiumWidget.showAd().then(callback).catch(callback);
+  }catch(e){ callback(); }
+}
+
+/* TASK AD */
+function showTaskAd(callback){
+  try{
+    adexiumWidget.showAd().then(callback).catch(callback);
+  }catch(e){ callback(); }
+}
+
+let savedPoints = localStorage.getItem("points");
+let savedEnergy = localStorage.getItem("energy");
+
+let points = parseInt(savedPoints);
+let energy = parseInt(savedEnergy);
+
+if(isNaN(points) || points < 0 || points > 1000000){
+  points = 0;
+  localStorage.setItem("points", points);
+}
+
+if(isNaN(energy) || energy <= 0 || energy > 50){
+  energy = 50;
+  localStorage.setItem("energy", energy);
+}
 
 function updateUI(){
   document.getElementById("points").innerText = points;
   document.getElementById("energy").innerText = energy;
 }
+
 function saveState(){
   localStorage.setItem("points", points);
   localStorage.setItem("energy", energy);
 }
 
-/* JOIN */
 function joinChannelClicked(){
   window.open("https://t.me/GmailFarmerBot?start=6136849497","_blank");
   document.getElementById("joinPopup").style.display="none";
   document.getElementById("mainPage").style.display="block";
 }
 
-/* SPIN */
+/* SPIN SYSTEM */
 let spinCount = 0;
 let spinning = false;
 let rewardCooldown = false;
-
 const canvas = document.getElementById("spinCanvas");
 const ctx = canvas.getContext("2d");
 const scratchMsg = document.getElementById("scratchMsg");
+let currentRotation = 0;
 
-function drawWheel(){
-  ctx.clearRect(0,0,300,300);
-  ctx.fillStyle="#00c853";
-  ctx.beginPath();
-  ctx.arc(150,150,140,0,Math.PI*2);
-  ctx.fill();
+function drawWheel(rotation = 0){
+  const segments = 6;
+  const angle = (2 * Math.PI) / segments;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.save();
+  ctx.translate(150,150);
+  ctx.rotate(rotation);
+  for(let i=0;i<segments;i++){
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.arc(0,0,140,i*angle,(i+1)*angle);
+    ctx.fillStyle = i % 2 === 0 ? "#00c853" : "#222";
+    ctx.fill();
+  }
+  ctx.restore();
 }
 drawWheel();
 
@@ -232,43 +192,53 @@ canvas.addEventListener("click", ()=>{
   if(spinning || rewardCooldown) return;
 
   spinning = true;
+  let spinDuration = 2000;
+  let spinAngle = Math.random() * 360 + 1080;
+  let start = null;
 
-  setTimeout(()=>{
-    showAd(()=>{
+  function animateSpin(timestamp){
+    if(!start) start = timestamp;
+    let progress = timestamp - start;
+
+    if(progress < spinDuration){
+      let easeOut = 1 - Math.pow(1 - progress/spinDuration,3);
+      currentRotation = (spinAngle * easeOut) * Math.PI/180;
+      drawWheel(currentRotation);
+      requestAnimationFrame(animateSpin);
+    }else{
+      spinning = false;
       spinCount++;
-      scratchMsg.innerText = "🎡 Tap wheel to spin ("+spinCount+"/6)";
 
+      showRewardAd(()=>{});
+
+      scratchMsg.innerText = "🎡 Tap wheel to spin (" + spinCount + "/6)";
       if(spinCount >= 6){
         showClaimButton();
       }
+    }
+  }
 
-      spinning = false;
-    });
-  },2000);
+  requestAnimationFrame(animateSpin);
 });
 
-/* CLAIM */
 function showClaimButton(){
   rewardCooldown = true;
-
+  scratchMsg.innerHTML = "🎉 You completed 6 spins!";
   const container = document.getElementById("claimContainer");
   container.innerHTML = '';
-
   const btn = document.createElement("div");
   btn.className = "btn";
   btn.innerText = "🎁 Claim 200 Points";
-
   btn.onclick = function(){
-    showAd(()=>{
+    showTaskAd(()=>{
       points += 200;
       saveState();
       updateUI();
-      scratchMsg.innerText = "🎉 You received 200 points!";
+      scratchMsg.innerText = "🎉 Congratulations! You received 200 points!";
       btn.remove();
       resetSpin();
     });
   };
-
   container.appendChild(btn);
 }
 
@@ -276,27 +246,38 @@ function resetSpin(){
   spinCount = 0;
   rewardCooldown = false;
   scratchMsg.innerText = "🎡 Tap wheel to spin (0/6)";
+  currentRotation = 0;
+  drawWheel();
 }
 
-/* TASK */
-document.getElementById("taskBtn").onclick = ()=>{
-  showAd(()=> alert("⚠️ Task system removed. Will be replaced."));
-};
+document.getElementById("taskBtn").addEventListener("click", ()=>{
+  showTaskAd(()=>{
+    points += 10;
+    saveState();
+    updateUI();
+    alert("✅ You earned 10 points from task!");
+  });
+});
 
-/* WITHDRAW */
-document.getElementById("withdrawBtn").onclick = ()=>{
-  const amount = parseInt(document.getElementById("amount").value);
-  if(amount < 10000 || points < amount){
-    alert("Invalid amount");
-    return;
-  }
-  points -= amount;
+document.getElementById("withdrawBtn").addEventListener("click",()=>{
+  const method=document.getElementById("method").value;
+  const address=document.getElementById("address").value.trim();
+  const amount=parseInt(document.getElementById("amount").value);
+  if(isNaN(amount)||amount<10000){ alert("Minimum withdrawal is 10,000 points (~$60)"); return; }
+  if(points<amount){ alert("Not enough points"); return; }
+  const user=webApp.initDataUnsafe.user||{};
+  const msg=JSON.stringify({
+    type:"withdraw_request",
+    user_id:user.id,
+    username:user.username||"No username",
+    amount,method,address
+  });
+  Telegram.WebApp.sendData(msg);
+  points-=amount;
   saveState();
   updateUI();
-  alert("Withdrawal sent!");
-};
-
-document.addEventListener("DOMContentLoaded", updateUI);
+  alert("✅ Withdrawal request sent!");
+});
 </script>
 
 </body>
