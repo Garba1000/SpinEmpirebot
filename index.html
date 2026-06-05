@@ -42,35 +42,6 @@ body{
   border-radius:20px;
 }
 
-.balance-box{
-  background:linear-gradient(135deg,#18d95d,#0c7b30);
-  border-radius:28px;
-  padding:25px;
-  text-align:center;
-  margin-bottom:18px;
-  box-shadow:0 0 20px rgba(0,0,0,0.25);
-}
-
-.balance-box h2{
-  font-size:52px;
-  margin-top:10px;
-}
-
-.progress{
-  width:100%;
-  height:10px;
-  background:rgba(255,255,255,0.2);
-  border-radius:30px;
-  overflow:hidden;
-  margin-top:15px;
-}
-
-.progress div{
-  height:100%;
-  width:0%;
-  background:#fff;
-}
-
 .wallet-bar{
   display:flex;
   justify-content:space-between;
@@ -81,7 +52,7 @@ body{
 .wallet-card{
   flex:1;
   background:#0f4422;
-  padding:14px;
+  padding:16px;
   border-radius:18px;
   text-align:center;
 }
@@ -92,7 +63,7 @@ body{
 }
 
 .wallet-card p{
-  font-size:18px;
+  font-size:22px;
   font-weight:bold;
 }
 
@@ -130,6 +101,7 @@ body{
   cursor:pointer;
   background:linear-gradient(45deg,#25ff74,#00c853);
   color:#000;
+  font-size:15px;
 }
 
 .btn:active{
@@ -213,21 +185,13 @@ input,select{
 <body>
 
 <div class="header">
-  <div class="logo">⚡ Tap & Earn X</div>
+
+  <div class="logo">
+    ⚡ Tap & Earn X
+  </div>
 
   <div class="level">
     Level <span id="level">1</span>
-  </div>
-</div>
-
-<div class="balance-box">
-
-  <p>Total XP</p>
-
-  <h2 id="points">0</h2>
-
-  <div class="progress">
-    <div id="bar"></div>
   </div>
 
 </div>
@@ -236,17 +200,17 @@ input,select{
 
   <div class="wallet-card">
     <h3>⚡ Energy</h3>
-    <p id="energy">100</p>
+    <p id="energy">0</p>
   </div>
 
   <div class="wallet-card">
-    <h3>🎡 Spins</h3>
-    <p id="spins">2</p>
+    <h3>💰 PV</h3>
+    <p id="points">0</p>
   </div>
 
   <div class="wallet-card">
-    <h3>💎 Gems</h3>
-    <p id="gems">0</p>
+    <h3>👥 Referrals</h3>
+    <p id="refs">0</p>
   </div>
 
 </div>
@@ -254,13 +218,13 @@ input,select{
 <div class="grid">
 
   <div class="card">
-    <h3>🎡 Total Spins</h3>
+    <h3>🎡 Total Played</h3>
     <p id="taps">0</p>
   </div>
 
   <div class="card">
-    <h3>👥 Referrals</h3>
-    <p id="refs">0</p>
+    <h3>🏆 Referral PV</h3>
+    <p id="refEarn">0</p>
   </div>
 
 </div>
@@ -280,7 +244,7 @@ input,select{
   <div class="pointer"></div>
 
   <button class="btn" id="spinBtn">
-    Spin Wheel
+    Spin (-10 Energy)
   </button>
 
 </div>
@@ -290,7 +254,7 @@ input,select{
   <h2>📺 Reward Ad</h2>
 
   <button class="btn" id="rewardBtn">
-    Watch Ad +10 XP
+    Watch Ad +100 Energy
   </button>
 
 </div>
@@ -300,7 +264,7 @@ input,select{
   <h2>🎯 Task Center</h2>
 
   <button class="btn" id="taskBtn">
-    Complete Task +10 XP
+    Complete Task +100 Energy
   </button>
 
 </div>
@@ -310,7 +274,7 @@ input,select{
   <h2>🎁 Daily Reward</h2>
 
   <button class="btn" id="dailyBtn">
-    Start Daily Bonus
+    Claim +1000 Energy
   </button>
 
   <div id="dailyProgressBar">
@@ -354,7 +318,7 @@ input,select{
   >
 
   <button class="btn" id="withdrawBtn">
-    Withdraw XP
+    Withdraw PV
   </button>
 
 </div>
@@ -405,12 +369,11 @@ const BOT_USERNAME = "Profitvablebot";
 let user = null;
 let uid = null;
 
-let xp = 0;
+let pv = 0;
 let taps = 0;
 let refs = 0;
 
-let spins = 2;
-let gems = 0;
+let energy = 0;
 
 let dailyProgress = 0;
 let lastDaily = 0;
@@ -422,7 +385,7 @@ function userRef(){
   return ref(db,"users/"+uid);
 }
 
-/* INIT */
+/* INIT USER */
 
 async function initUser(){
 
@@ -472,14 +435,13 @@ async function loadUser(){
 
     await set(userRef(),{
 
-      xp:0,
+      pv:0,
       taps:0,
 
       referrals:0,
       ref_earnings:0,
 
-      spins:2,
-      gems:0,
+      energy:0,
 
       dailyProgress:0,
       lastDaily:0,
@@ -518,16 +480,15 @@ async function loadUser(){
   const d =
     (await get(userRef())).val();
 
-  xp = d.xp || 0;
+  pv = d.pv || 0;
 
   taps = d.taps || 0;
 
   refs =
     Number(d.referrals || 0);
 
-  spins = d.spins || 2;
-
-  gems = d.gems || 0;
+  energy =
+    d.energy || 0;
 
   dailyProgress =
     d.dailyProgress || 0;
@@ -552,11 +513,10 @@ async function save(){
 
   await update(userRef(),{
 
-    xp,
+    pv,
     taps,
 
-    spins,
-    gems,
+    energy,
 
     dailyProgress,
     lastDaily,
@@ -591,16 +551,16 @@ async function giveRefBonus(amount){
 
   if(rs.exists()){
 
-    const oldXp =
-      rs.val().xp || 0;
+    const oldPv =
+      rs.val().pv || 0;
 
     const oldEarn =
       rs.val().ref_earnings || 0;
 
     await update(r,{
 
-      xp:
-      oldXp + bonus,
+      pv:
+      oldPv + bonus,
 
       ref_earnings:
       oldEarn + bonus
@@ -614,7 +574,10 @@ async function giveRefBonus(amount){
 function updateUI(){
 
   document.getElementById("points")
-  .innerText = xp;
+  .innerText = pv;
+
+  document.getElementById("energy")
+  .innerText = energy;
 
   document.getElementById("taps")
   .innerText = taps;
@@ -622,19 +585,12 @@ function updateUI(){
   document.getElementById("refs")
   .innerText = refs;
 
-  document.getElementById("spins")
-  .innerText = spins;
-
-  document.getElementById("gems")
-  .innerText = gems;
+  document.getElementById("refEarn")
+  .innerText = refEarn;
 
   document.getElementById("level")
   .innerText =
-    Math.floor(xp / 500) + 1;
-
-  document.getElementById("bar")
-  .style.width =
-    (xp % 500) / 500 * 100 + "%";
+    Math.floor(pv / 500) + 1;
 
   document.querySelector(
     "#dailyProgressBar div"
@@ -662,10 +618,19 @@ document.getElementById("spinBtn")
   if(spinning)
   return;
 
+  if(energy < 10){
+
+    return alert(
+      "Not enough energy"
+    );
+  }
+
   spinning = true;
 
+  energy -= 10;
+
   const rewards =
-  [5,10,20,50,100,15,30,8];
+  [5,8,10,12,15,18,20,25,30];
 
   const reward =
     rewards[
@@ -694,7 +659,7 @@ document.getElementById("spinBtn")
 
   setTimeout(async ()=>{
 
-    xp += reward;
+    pv += reward;
 
     taps++;
 
@@ -707,7 +672,7 @@ document.getElementById("spinBtn")
     alert(
       "🎉 You won " +
       reward +
-      " XP"
+      " PV"
     );
 
     spinning = false;
@@ -746,9 +711,7 @@ document.getElementById("rewardBtn")
 
   if(r?.done){
 
-    xp += 10;
-
-    await giveRefBonus(10);
+    energy += 100;
 
     await save();
 
@@ -766,9 +729,7 @@ document.getElementById("taskBtn")
 
   if(r?.done){
 
-    xp += 10;
-
-    await giveRefBonus(10);
+    energy += 100;
 
     await save();
 
@@ -791,55 +752,26 @@ document.getElementById("dailyBtn")
   let now = Date.now();
 
   if(
-    now - lastDaily < 86400000 &&
-    dailyProgress === 4
+    now - lastDaily < 86400000
   ){
     return alert(
-      "Daily reward completed"
+      "Come back tomorrow"
     );
   }
 
-  let block =
-    blocks[dailyProgress];
+  energy += 1000;
 
-  let task =
-    document.createElement(
-      "adsgram-task"
-    );
+  dailyProgress = 4;
 
-  task.setAttribute(
-    "data-block-id",
-    block
+  lastDaily = now;
+
+  await save();
+
+  updateUI();
+
+  alert(
+    "+1000 Energy Added"
   );
-
-  document.body.appendChild(task);
-
-  task.addEventListener(
-    "reward",
-    async ()=>{
-
-      dailyProgress++;
-
-      if(dailyProgress === 4){
-
-        xp += 900;
-
-        await giveRefBonus(900);
-
-        lastDaily = now;
-
-        dailyProgress = 0;
-      }
-
-      await save();
-
-      updateUI();
-
-      task.remove();
-    }
-  );
-
-  task.load?.();
 };
 
 /* COPY */
@@ -890,12 +822,12 @@ document.getElementById(
 
   if(amount < 10000)
     return alert(
-      "Minimum 10,000 XP"
+      "Minimum 10,000 PV"
     );
 
-  if(amount > xp)
+  if(amount > pv)
     return alert(
-      "Insufficient XP"
+      "Insufficient PV"
     );
 
   if(!wallet)
@@ -903,7 +835,7 @@ document.getElementById(
       "Enter wallet"
     );
 
-  xp -= amount;
+  pv -= amount;
 
   await save();
 
