@@ -284,7 +284,7 @@ input,select{
   <h2>📺 Reward Ad</h2>
 
   <button class="btn" id="rewardBtn">
-    Watch Ad +10 Energy
+    Watch Ad +3 Energy
   </button>
 
 </div>
@@ -294,7 +294,7 @@ input,select{
   <h2>🎯 Task Center</h2>
 
   <button class="btn" id="taskBtn">
-    Complete Task +10 Energy
+    Complete Task +3 Energy
   </button>
 
 </div>
@@ -304,7 +304,7 @@ input,select{
   <h2>🎁 Daily Reward</h2>
 
   <button class="btn" id="dailyBtn">
-    Claim +1000 Energy
+    Claim +3 Energy
   </button>
 
   <div id="dailyProgressBar">
@@ -515,7 +515,7 @@ document.getElementById("spinBtn")
   if(spinning)
   return;
 
-  if(energy < 10){
+  if(energy < 3){
 
     return alert(
       "Not enough energy"
@@ -524,7 +524,7 @@ document.getElementById("spinBtn")
 
   spinning = true;
 
-  energy -= 10;
+  energy -= 3;
 
   saveData();
 
@@ -628,14 +628,14 @@ document.getElementById("rewardBtn")
 
   if(r?.done){
 
-    energy += 10;
+    energy += 3;
 
     saveData();
 
     updateUI();
 
     alert(
-      "+10 Energy"
+      "+3 Energy"
     );
   }
 };
@@ -653,14 +653,14 @@ document.getElementById("taskBtn")
 
   if(r?.done){
 
-    energy += 10;
+    energy += 3;
 
     saveData();
 
     updateUI();
 
     alert(
-      "+10 Energy"
+      "+3 Energy"
     );
   }
 };
@@ -697,7 +697,7 @@ document.getElementById("dailyBtn")
 
     if(index >= 4){
 
-      energy += 1000;
+      energy += 3;
 
       dailyClaim = now;
 
@@ -708,7 +708,7 @@ document.getElementById("dailyBtn")
       updateUI();
 
       return alert(
-        "🎉 Daily bonus completed! +1000 Energy"
+        "🎉 Daily bonus completed! +3 Energy"
       );
     }
 
@@ -762,7 +762,7 @@ document.getElementById(
   "joinBtn"
 ).onclick = ()=>{
 
-  energy += 5;
+  energy += 1;
 
   saveData();
 
