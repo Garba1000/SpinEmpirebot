@@ -207,39 +207,6 @@ input,select{
   margin-top:-10px;
 }
 
-#joinPopup{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.8);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  z-index:9999;
-}
-
-.popup-box{
-  background:#0d3c1d;
-  padding:30px;
-  border-radius:25px;
-  width:90%;
-  max-width:350px;
-  text-align:center;
-}
-
-.popup-box button{
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:15px;
-  margin-top:18px;
-  font-weight:bold;
-  background:#25ff74;
-}
-
 </style>
 </head>
 
@@ -247,18 +214,22 @@ input,select{
 
 <div class="header">
   <div class="logo">⚡ Tap & Earn X</div>
+
   <div class="level">
     Level <span id="level">1</span>
   </div>
 </div>
 
 <div class="balance-box">
+
   <p>Total XP</p>
+
   <h2 id="points">0</h2>
 
   <div class="progress">
     <div id="bar"></div>
   </div>
+
 </div>
 
 <div class="wallet-bar">
@@ -315,20 +286,27 @@ input,select{
 </div>
 
 <div class="section">
+
   <h2>📺 Reward Ad</h2>
+
   <button class="btn" id="rewardBtn">
     Watch Ad +10 XP
   </button>
+
 </div>
 
 <div class="section">
+
   <h2>🎯 Task Center</h2>
+
   <button class="btn" id="taskBtn">
     Complete Task +10 XP
   </button>
+
 </div>
 
 <div class="section">
+
   <h2>🎁 Daily Reward</h2>
 
   <button class="btn" id="dailyBtn">
@@ -338,6 +316,7 @@ input,select{
   <div id="dailyProgressBar">
     <div></div>
   </div>
+
 </div>
 
 <div class="section">
@@ -363,31 +342,20 @@ input,select{
     <option>Bank</option>
   </select>
 
-  <input id="wallet" placeholder="Wallet Address">
+  <input
+    id="wallet"
+    placeholder="Wallet Address"
+  >
 
-  <input id="amount" type="number" placeholder="Amount">
+  <input
+    id="amount"
+    type="number"
+    placeholder="Amount"
+  >
 
   <button class="btn" id="withdrawBtn">
     Withdraw XP
   </button>
-
-</div>
-
-<div id="joinPopup">
-
-  <div class="popup-box">
-
-    <h2>Join Our Channel</h2>
-
-    <p style="margin-top:10px;">
-      Join channel and earn bonus XP
-    </p>
-
-    <button id="joinBtn">
-      Join Channel +5 XP
-    </button>
-
-  </div>
 
 </div>
 
@@ -412,14 +380,17 @@ from "https://www.gstatic.com/firebasejs/12.14.0/firebase-database.js";
 
 const app = initializeApp({
 
-  apiKey: "AIzaSyC2dCYo4mgndxzFNSlcwGr1V7Ypp6VC0Cw",
+  apiKey:
+  "AIzaSyC2dCYo4mgndxzFNSlcwGr1V7Ypp6VC0Cw",
 
-  authDomain: "urser-a8a29.firebaseapp.com",
+  authDomain:
+  "urser-a8a29.firebaseapp.com",
 
   databaseURL:
   "https://urser-a8a29-default-rtdb.firebaseio.com",
 
-  projectId: "urser-a8a29",
+  projectId:
+  "urser-a8a29",
 
 });
 
@@ -492,7 +463,8 @@ function getStartParam(){
 
 async function loadUser(){
 
-  const snap = await get(userRef());
+  const snap =
+    await get(userRef());
 
   if(!snap.exists()){
 
@@ -502,6 +474,7 @@ async function loadUser(){
 
       xp:0,
       taps:0,
+
       referrals:0,
       ref_earnings:0,
 
@@ -513,8 +486,11 @@ async function loadUser(){
 
       referred_by:refBy,
 
-      username:user?.username || "",
-      first_name:user?.first_name || "",
+      username:
+      user?.username || "",
+
+      first_name:
+      user?.first_name || "",
 
       telegram_id:uid
 
@@ -525,7 +501,8 @@ async function loadUser(){
       const r =
         ref(db,"users/"+refBy);
 
-      const rs = await get(r);
+      const rs =
+        await get(r);
 
       if(rs.exists()){
 
@@ -542,12 +519,14 @@ async function loadUser(){
     (await get(userRef())).val();
 
   xp = d.xp || 0;
+
   taps = d.taps || 0;
 
   refs =
     Number(d.referrals || 0);
 
   spins = d.spins || 2;
+
   gems = d.gems || 0;
 
   dailyProgress =
@@ -575,15 +554,18 @@ async function save(){
 
     xp,
     taps,
+
     spins,
     gems,
 
     dailyProgress,
     lastDaily,
 
-    ref_earnings:refEarn,
+    ref_earnings:
+    refEarn,
 
-    updated_at:Date.now()
+    updated_at:
+    Date.now()
 
   });
 }
@@ -604,7 +586,8 @@ async function giveRefBonus(amount){
   const r =
     ref(db,"users/"+refBy);
 
-  const rs = await get(r);
+  const rs =
+    await get(r);
 
   if(rs.exists()){
 
@@ -616,7 +599,8 @@ async function giveRefBonus(amount){
 
     await update(r,{
 
-      xp: oldXp + bonus,
+      xp:
+      oldXp + bonus,
 
       ref_earnings:
       oldEarn + bonus
@@ -667,7 +651,7 @@ function setReferralLink(){
   `https://t.me/${BOT_USERNAME}?start=${uid}`;
 }
 
-/* SPIN */
+/* SPIN SYSTEM */
 
 let spinning = false;
 let wheelRotation = 0;
@@ -749,18 +733,10 @@ window.onload = ()=>{
       Adsgram.init({
         blockId:"29780"
       });
-
-    setTimeout(()=>{
-
-      document.getElementById(
-        "joinPopup"
-      ).style.display = "flex";
-
-    },3000);
   }
 };
 
-/* REWARD */
+/* REWARD AD */
 
 document.getElementById("rewardBtn")
 .onclick = async ()=>{
@@ -866,50 +842,6 @@ document.getElementById("dailyBtn")
   task.load?.();
 };
 
-/* JOIN */
-
-document.getElementById("joinBtn")
-.onclick = async ()=>{
-
-  const snap =
-    await get(userRef());
-
-  const data =
-    snap.val() || {};
-
-  if(data.joinRewardClaimed){
-
-    window.open(
-      "https://t.me/CashGyana",
-      "_blank"
-    );
-
-    return;
-  }
-
-  xp += 5;
-
-  await update(userRef(),{
-
-    joinRewardClaimed:true,
-    xp:xp
-
-  });
-
-  await giveRefBonus(5);
-
-  updateUI();
-
-  document.getElementById(
-    "joinPopup"
-  ).style.display = "none";
-
-  window.open(
-    "https://t.me/CashGyana",
-    "_blank"
-  );
-};
-
 /* COPY */
 
 document.getElementById("copyBtn")
@@ -923,7 +855,9 @@ document.getElementById("copyBtn")
 
   );
 
-  alert("Referral link copied");
+  alert(
+    "Referral link copied"
+  );
 };
 
 /* WITHDRAW */
