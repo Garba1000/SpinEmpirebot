@@ -1,304 +1,992 @@
-Update this my bot index please don't change anything I don't ask you
-Remove all adsgram block id bot reward block I'd, pre load reward block I'd an task-block then I will send you adexium script reply in the same place please don't destroyed my index
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Spin & Earn</title>
-
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: #000;
-  color: #fff;
-  margin: 0;
-  padding: 20px;
-}
-h1, h2 { margin-bottom: 10px; }
-.section { margin-top: 10px; padding: 15px; background: #111; border-radius: 10px; }
-.btn {
-  display: inline-block;
-  margin-top: 8px;
-  padding: 10px 15px;
-  border-radius: 8px;
-  background: #00c853;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  text-align: center;
-}
-.btn:active { transform: scale(0.95); }
-.hidden { display: none; }
-input, select {
-  padding: 8px; margin: 5px 0; width: 100%; border-radius: 5px; border: none;
-}
-#joinPopup {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.95);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  text-align: center;
-  padding: 20px;
-  z-index: 9999;
-}
-canvas { border-radius: 10px; display: block; margin: 10px auto; }
-</style>
+<title>Tap & Earn X</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:
+  radial-gradient(circle at top,#19b84d,#063517 70%);
+  color:white;
+  font-family:Arial,sans-serif;
+  padding:15px;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.logo{
+  font-size:26px;
+  font-weight:bold;
+}
+
+.level{
+  background:#0e5226;
+  padding:10px 16px;
+  border-radius:20px;
+}
+
+.balance-box{
+  background:linear-gradient(135deg,#18d95d,#0c7b30);
+  border-radius:28px;
+  padding:25px;
+  text-align:center;
+  margin-bottom:18px;
+  box-shadow:0 0 20px rgba(0,0,0,0.25);
+}
+
+.balance-box h2{
+  font-size:52px;
+  margin-top:10px;
+}
+
+.progress{
+  width:100%;
+  height:10px;
+  background:rgba(255,255,255,0.2);
+  border-radius:30px;
+  overflow:hidden;
+  margin-top:15px;
+}
+
+.progress div{
+  height:100%;
+  width:0%;
+  background:#fff;
+}
+
+.wallet-bar{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:18px;
+}
+
+.wallet-card{
+  flex:1;
+  background:#0f4422;
+  padding:14px;
+  border-radius:18px;
+  text-align:center;
+}
+
+.wallet-card h3{
+  font-size:14px;
+  margin-bottom:6px;
+}
+
+.wallet-card p{
+  font-size:18px;
+  font-weight:bold;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-bottom:18px;
+}
+
+.card{
+  background:#0d3c1d;
+  padding:18px;
+  border-radius:20px;
+}
+
+.card h3{
+  margin-bottom:10px;
+}
+
+.section{
+  background:#0d3c1d;
+  padding:18px;
+  border-radius:22px;
+  margin-bottom:18px;
+}
+
+.btn{
+  width:100%;
+  border:none;
+  padding:14px;
+  border-radius:16px;
+  margin-top:14px;
+  font-weight:bold;
+  cursor:pointer;
+  background:linear-gradient(45deg,#25ff74,#00c853);
+  color:#000;
+}
+
+.btn:active{
+  transform:scale(0.98);
+}
+
+input,select{
+  width:100%;
+  padding:13px;
+  border:none;
+  border-radius:14px;
+  background:#184d2a;
+  color:white;
+  margin-top:12px;
+}
+
+#dailyProgressBar{
+  width:100%;
+  height:8px;
+  background:#1f5e35;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:10px;
+}
+
+#dailyProgressBar div{
+  width:0%;
+  height:100%;
+  background:#fff;
+}
+
+#wheel{
+  width:270px;
+  height:270px;
+  border-radius:50%;
+  margin:20px auto;
+  position:relative;
+  border:10px solid #111;
+  background:
+    conic-gradient(
+      #ffcc00 0deg 45deg,
+      #00e0ff 45deg 90deg,
+      #ff4d6d 90deg 135deg,
+      #00c853 135deg 180deg,
+      #ff9100 180deg 225deg,
+      #aa00ff 225deg 270deg,
+      #00b0ff 270deg 315deg,
+      #ff1744 315deg 360deg
+    );
+}
+
+.wheel-center{
+  position:absolute;
+  width:80px;
+  height:80px;
+  background:#111;
+  border-radius:50%;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-weight:bold;
+  border:5px solid #fff;
+}
+
+.pointer{
+  width:0;
+  height:0;
+  border-left:15px solid transparent;
+  border-right:15px solid transparent;
+  border-top:30px solid white;
+  margin:auto;
+  margin-top:-10px;
+}
+
+#joinPopup{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.8);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:9999;
+}
+
+.popup-box{
+  background:#0d3c1d;
+  padding:30px;
+  border-radius:25px;
+  width:90%;
+  max-width:350px;
+  text-align:center;
+}
+
+.popup-box button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:15px;
+  margin-top:18px;
+  font-weight:bold;
+  background:#25ff74;
+}
+
+</style>
 </head>
 
 <body>
 
+<div class="header">
+  <div class="logo">⚡ Tap & Earn X</div>
+  <div class="level">
+    Level <span id="level">1</span>
+  </div>
+</div>
+
+<div class="balance-box">
+  <p>Total XP</p>
+  <h2 id="points">0</h2>
+
+  <div class="progress">
+    <div id="bar"></div>
+  </div>
+</div>
+
+<div class="wallet-bar">
+
+  <div class="wallet-card">
+    <h3>⚡ Energy</h3>
+    <p id="energy">100</p>
+  </div>
+
+  <div class="wallet-card">
+    <h3>🎡 Spins</h3>
+    <p id="spins">2</p>
+  </div>
+
+  <div class="wallet-card">
+    <h3>💎 Gems</h3>
+    <p id="gems">0</p>
+  </div>
+
+</div>
+
+<div class="grid">
+
+  <div class="card">
+    <h3>🎡 Total Spins</h3>
+    <p id="taps">0</p>
+  </div>
+
+  <div class="card">
+    <h3>👥 Referrals</h3>
+    <p id="refs">0</p>
+  </div>
+
+</div>
+
+<div class="section">
+
+  <h2>🎡 Spin & Earn</h2>
+
+  <div id="wheel">
+
+    <div class="wheel-center">
+      SPIN
+    </div>
+
+  </div>
+
+  <div class="pointer"></div>
+
+  <button class="btn" id="spinBtn">
+    Spin Wheel
+  </button>
+
+</div>
+
+<div class="section">
+  <h2>📺 Reward Ad</h2>
+  <button class="btn" id="rewardBtn">
+    Watch Ad +10 XP
+  </button>
+</div>
+
+<div class="section">
+  <h2>🎯 Task Center</h2>
+  <button class="btn" id="taskBtn">
+    Complete Task +10 XP
+  </button>
+</div>
+
+<div class="section">
+  <h2>🎁 Daily Reward</h2>
+
+  <button class="btn" id="dailyBtn">
+    Start Daily Bonus
+  </button>
+
+  <div id="dailyProgressBar">
+    <div></div>
+  </div>
+</div>
+
+<div class="section">
+
+  <h2>👥 Referral</h2>
+
+  <input id="refInput" readonly>
+
+  <button class="btn" id="copyBtn">
+    Copy Referral Link
+  </button>
+
+</div>
+
+<div class="section">
+
+  <h2>💳 Withdraw</h2>
+
+  <select id="method">
+    <option>USDT</option>
+    <option>Litecoin</option>
+    <option>Payeer</option>
+    <option>Bank</option>
+  </select>
+
+  <input id="wallet" placeholder="Wallet Address">
+
+  <input id="amount" type="number" placeholder="Amount">
+
+  <button class="btn" id="withdrawBtn">
+    Withdraw XP
+  </button>
+
+</div>
+
 <div id="joinPopup">
-  <h2>📢 Join Our Telegram Channel to Continue</h2>
-  <p>You must join before using the app.</p>
-  <button onclick="joinChannelClicked()">👉 Join @earnzoners</button>
-</div>
 
-<div id="mainPage" style="display:none;">
+  <div class="popup-box">
 
-<h1>⚡ Spin & Earn Points</h1>
-<p>Points: <span id="points">0</span> | Energy: <span id="energy">50</span></p>
+    <h2>Join Our Channel</h2>
 
-<!-- SPIN SECTION -->
-<div class="section">
-  <canvas id="spinCanvas" width="300" height="300"></canvas>
-  <p id="scratchMsg">🎡 Tap wheel to spin (0/6)</p>
-</div>
+    <p style="margin-top:10px;">
+      Join channel and earn bonus XP
+    </p>
 
-<!-- CLAIM 200 POINTS BUTTON -->
-<div class="section">
-  <div id="claimContainer"></div>
-</div>
+    <button id="joinBtn">
+      Join Channel +5 XP
+    </button>
 
-<!-- TASK BUTTON CLOSE TO SPIN -->
-<div class="section">
-  <div class="btn" id="taskBtn">📋 Task</div>
-  <div id="taskContainer" class="hidden"></div>
-</div>
-
-<!-- WITHDRAW CLOSE TO SPIN -->
-<div class="section">
-<h2>💳 Withdraw</h2>
-<p><b>Minimum withdrawal is 10,000 points (~$60)</b></p>
-<select id="method">
-<option value="Litecoin">Litecoin</option>
-<option value="USDT">USDT</option>
-<option value="Payeer">Payeer</option>
-<option value="Bank">Bank Account</option>
-</select>
-<input type="text" id="address" placeholder="Enter wallet or account"/>
-<input type="number" id="amount" placeholder="Minimum 10000"/>
-<div class="btn" id="withdrawBtn">Request Withdraw</div>
-</div>
+  </div>
 
 </div>
 
-<script>
-const webApp = Telegram.WebApp;
+<script type="module">
 
-/* FIXED POINTS LOADING */
-let savedPoints = localStorage.getItem("points");
-let savedEnergy = localStorage.getItem("energy");
+const tg = window.Telegram?.WebApp;
+tg?.expand?.();
 
-let points = parseInt(savedPoints);
-let energy = parseInt(savedEnergy);
+/* FIREBASE */
 
-if(isNaN(points) || points < 0 || points > 1000000){
-  points = 0;
-  localStorage.setItem("points", points);
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+
+import {
+  getDatabase,
+  ref,
+  set,
+  get,
+  update
+}
+from "https://www.gstatic.com/firebasejs/12.14.0/firebase-database.js";
+
+const app = initializeApp({
+
+  apiKey: "AIzaSyC2dCYo4mgndxzFNSlcwGr1V7Ypp6VC0Cw",
+
+  authDomain: "urser-a8a29.firebaseapp.com",
+
+  databaseURL:
+  "https://urser-a8a29-default-rtdb.firebaseio.com",
+
+  projectId: "urser-a8a29",
+
+});
+
+const db = getDatabase(app);
+
+/* CONFIG */
+
+const BOT_USERNAME = "Profitvablebot";
+
+/* STATE */
+
+let user = null;
+let uid = null;
+
+let xp = 0;
+let taps = 0;
+let refs = 0;
+
+let spins = 2;
+let gems = 0;
+
+let dailyProgress = 0;
+let lastDaily = 0;
+
+let refBy = null;
+let refEarn = 0;
+
+function userRef(){
+  return ref(db,"users/"+uid);
 }
 
-if(isNaN(energy) || energy <= 0 || energy > 50){
-  energy = 50;
-  localStorage.setItem("energy", energy);
-}
+/* INIT */
 
-function updateUI(){
-  document.getElementById("points").innerText = points;
-  document.getElementById("energy").innerText = energy;
-}
+async function initUser(){
 
-function saveState(){
-  localStorage.setItem("points", points);
-  localStorage.setItem("energy", energy);
-}
+  user =
+    tg?.initDataUnsafe?.user || {};
 
-/* JOIN CHANNEL */
-function joinChannelClicked(){
-  window.open("https://t.me/GmailFarmerBot?start=6136849497","_blank");
-  document.getElementById("joinPopup").style.display="none";
-  document.getElementById("mainPage").style.display="block";
-}
+  const urlParams =
+    new URLSearchParams(window.location.search);
 
-/* PRELOADED ADSGRAM REWARD BLOCKS */
-const rewardBlocks = ["24083","24084","24085"];
-const spinTaskBlocks = ["task-24086","task-24087","task-24088","task-24089"];
+  uid =
+    urlParams.get("uid") ||
+    user?.id?.toString();
 
-function showSingleAd(){
-  try{
-    const randomBlock = rewardBlocks[Math.floor(Math.random()*rewardBlocks.length)];
-    const rewardAd = window.Adsgram.init({blockId: randomBlock});
-    rewardAd.show();
-  }catch(e){}
-}
-
-/* SPIN SYSTEM */
-let spinCount = 0;
-let spinning = false;
-let rewardCooldown = false;
-const canvas = document.getElementById("spinCanvas");
-const ctx = canvas.getContext("2d");
-const scratchMsg = document.getElementById("scratchMsg");
-let currentRotation = 0;
-
-function drawWheel(rotation = 0){
-  const segments = 6;
-  const angle = (2 * Math.PI) / segments;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.save();
-  ctx.translate(150,150);
-  ctx.rotate(rotation);
-  for(let i=0;i<segments;i++){
-    ctx.beginPath();
-    ctx.moveTo(0,0);
-    ctx.arc(0,0,140,i*angle,(i+1)*angle);
-    ctx.fillStyle = i % 2 === 0 ? "#00c853" : "#222";
-    ctx.fill();
+  if(!uid){
+    alert("User not found");
+    return;
   }
-  ctx.restore();
+
+  await loadUser();
 }
-drawWheel();
 
-canvas.addEventListener("click", ()=>{
-  if(spinning || rewardCooldown) return;
+initUser();
 
-  spinning = true;
-  let spinDuration = 2000;
-  let spinAngle = Math.random() * 360 + 1080;
-  let start = null;
+/* START PARAM */
 
-  function animateSpin(timestamp){
-    if(!start) start = timestamp;
-    let progress = timestamp - start;
+function getStartParam(){
 
-    if(progress < spinDuration){
-      let easeOut = 1 - Math.pow(1 - progress/spinDuration,3);
-      currentRotation = (spinAngle * easeOut) * Math.PI/180;
-      drawWheel(currentRotation);
-      requestAnimationFrame(animateSpin);
-    }else{
-      spinning = false;
-      spinCount++;
-      showSingleAd();
-      scratchMsg.innerText = "🎡 Tap wheel to spin (" + spinCount + "/6)";
-      if(spinCount >= 6){
-        showClaimButton();
+  const urlParams =
+    new URLSearchParams(window.location.search);
+
+  return (
+    urlParams.get("start") ||
+    urlParams.get("ref")
+  );
+}
+
+/* LOAD USER */
+
+async function loadUser(){
+
+  const snap = await get(userRef());
+
+  if(!snap.exists()){
+
+    refBy = getStartParam();
+
+    await set(userRef(),{
+
+      xp:0,
+      taps:0,
+      referrals:0,
+      ref_earnings:0,
+
+      spins:2,
+      gems:0,
+
+      dailyProgress:0,
+      lastDaily:0,
+
+      referred_by:refBy,
+
+      username:user?.username || "",
+      first_name:user?.first_name || "",
+
+      telegram_id:uid
+
+    });
+
+    if(refBy && refBy !== uid){
+
+      const r =
+        ref(db,"users/"+refBy);
+
+      const rs = await get(r);
+
+      if(rs.exists()){
+
+        update(r,{
+          referrals:
+          (rs.val().referrals || 0) + 1
+        });
+
       }
     }
   }
 
-  requestAnimationFrame(animateSpin);
-});
+  const d =
+    (await get(userRef())).val();
 
-function showClaimButton(){
-  rewardCooldown = true;
-  scratchMsg.innerHTML = "🎉 You completed 6 spins!";
-  const container = document.getElementById("claimContainer");
-  container.innerHTML = '';
-  const btn = document.createElement("div");
-  btn.className = "btn";
-  btn.innerText = "🎁 Claim 200 Points";
-  btn.onclick = function(){
-    showSpinTask();
-    btn.remove();
-  };
-  container.appendChild(btn);
-}
+  xp = d.xp || 0;
+  taps = d.taps || 0;
 
-function showSpinTask(){
-  const randomTask = spinTaskBlocks[Math.floor(Math.random()*spinTaskBlocks.length)];
-  const container = document.getElementById("taskContainer");
-  container.innerHTML = `<adsgram-task class="spin-task" data-block-id="${randomTask}"></adsgram-task>`;
-  container.classList.remove("hidden");
+  refs =
+    Number(d.referrals || 0);
 
-  const task = container.querySelector(".spin-task");
-  task.addEventListener("reward", ()=>{
-    points += 200;
-    saveState();
-    updateUI();
-    scratchMsg.innerText = "🎉 Congratulations! You received 200 points!";
-    container.classList.add("hidden");
-    resetSpin();
-  });
-}
+  spins = d.spins || 2;
+  gems = d.gems || 0;
 
-function resetSpin(){
-  spinCount = 0;
-  rewardCooldown = false;
-  scratchMsg.innerText = "🎡 Tap wheel to spin (0/6)";
-  currentRotation = 0;
-  drawWheel();
-}
+  dailyProgress =
+    d.dailyProgress || 0;
 
-document.getElementById("taskBtn").addEventListener("click", ()=>{
-  const randomTask = spinTaskBlocks[Math.floor(Math.random()*spinTaskBlocks.length)];
-  const container = document.getElementById("taskContainer");
-  container.innerHTML = `<adsgram-task class="normal-task" data-block-id="${randomTask}"></adsgram-task>`;
-  container.classList.remove("hidden");
+  lastDaily =
+    d.lastDaily || 0;
 
-  const task = container.querySelector(".normal-task");
-  task.addEventListener("reward", ()=>{
-    points += 10;
-    saveState();
-    updateUI();
-    alert("✅ You earned 10 points from task!");
-    container.classList.add("hidden");
-  });
-});
+  refEarn =
+    d.ref_earnings || 0;
 
-document.getElementById("withdrawBtn").addEventListener("click",()=>{
-  const method=document.getElementById("method").value;
-  const address=document.getElementById("address").value.trim();
-  const amount=parseInt(document.getElementById("amount").value);
-  if(isNaN(amount)||amount<10000){ alert("Minimum withdrawal is 10,000 points (~$60)"); return; }
-  if(points<amount){ alert("Not enough points"); return; }
-  const user=webApp.initDataUnsafe.user||{};
-  const msg=JSON.stringify({
-    type:"withdraw_request",
-    user_id:user.id,
-    username:user.username||"No username",
-    amount,method,address
-  });
-  Telegram.WebApp.sendData(msg);
-  points-=amount;
-  saveState();
+  refBy =
+    d.referred_by || null;
+
+  setReferralLink();
+
   updateUI();
-  alert("✅ Withdrawal request sent!");
-});
+}
 
-function showJoinPopupAfterAds(){
-  try{
-    const randomBlock = rewardBlocks[Math.floor(Math.random()*rewardBlocks.length)];
-    const rewardAd = window.Adsgram.init({blockId: randomBlock});
-    rewardAd.show().finally(()=>{
-      document.getElementById("joinPopup").style.display="flex";
+/* SAVE */
+
+async function save(){
+
+  await update(userRef(),{
+
+    xp,
+    taps,
+    spins,
+    gems,
+
+    dailyProgress,
+    lastDaily,
+
+    ref_earnings:refEarn,
+
+    updated_at:Date.now()
+
+  });
+}
+
+/* REF BONUS */
+
+async function giveRefBonus(amount){
+
+  if(!refBy || refBy === uid)
+  return;
+
+  const bonus =
+    Math.floor(amount * 0.05);
+
+  if(bonus <= 0)
+  return;
+
+  const r =
+    ref(db,"users/"+refBy);
+
+  const rs = await get(r);
+
+  if(rs.exists()){
+
+    const oldXp =
+      rs.val().xp || 0;
+
+    const oldEarn =
+      rs.val().ref_earnings || 0;
+
+    await update(r,{
+
+      xp: oldXp + bonus,
+
+      ref_earnings:
+      oldEarn + bonus
+
     });
-  }catch(e){
-    document.getElementById("joinPopup").style.display="flex";
   }
 }
 
-document.addEventListener("DOMContentLoaded",()=>{
+/* UI */
+
+function updateUI(){
+
+  document.getElementById("points")
+  .innerText = xp;
+
+  document.getElementById("taps")
+  .innerText = taps;
+
+  document.getElementById("refs")
+  .innerText = refs;
+
+  document.getElementById("spins")
+  .innerText = spins;
+
+  document.getElementById("gems")
+  .innerText = gems;
+
+  document.getElementById("level")
+  .innerText =
+    Math.floor(xp / 500) + 1;
+
+  document.getElementById("bar")
+  .style.width =
+    (xp % 500) / 500 * 100 + "%";
+
+  document.querySelector(
+    "#dailyProgressBar div"
+  ).style.width =
+    (dailyProgress / 4) * 100 + "%";
+}
+
+/* REF LINK */
+
+function setReferralLink(){
+
+  document.getElementById("refInput")
+  .value =
+  `https://t.me/${BOT_USERNAME}?start=${uid}`;
+}
+
+/* SPIN */
+
+let spinning = false;
+let wheelRotation = 0;
+
+document.getElementById("spinBtn")
+.onclick = async ()=>{
+
+  if(spinning)
+  return;
+
+  spinning = true;
+
+  const rewards =
+  [5,10,20,50,100,15,30,8];
+
+  const reward =
+    rewards[
+      Math.floor(
+        Math.random() *
+        rewards.length
+      )
+    ];
+
+  const extraRotation =
+    1440 +
+    Math.floor(
+      Math.random() * 360
+    );
+
+  wheelRotation += extraRotation;
+
+  const wheel =
+    document.getElementById("wheel");
+
+  wheel.style.transition =
+    "transform 4s cubic-bezier(0.17,0.67,0.18,1)";
+
+  wheel.style.transform =
+    `rotate(${wheelRotation}deg)`;
+
+  setTimeout(async ()=>{
+
+    xp += reward;
+
+    taps++;
+
+    await giveRefBonus(reward);
+
+    await save();
+
+    updateUI();
+
+    alert(
+      "🎉 You won " +
+      reward +
+      " XP"
+    );
+
+    spinning = false;
+
+  },4000);
+};
+
+/* ADSGRAM */
+
+let rewardAd;
+let taskAd;
+
+window.onload = ()=>{
+
+  if(typeof Adsgram !== "undefined"){
+
+    rewardAd =
+      Adsgram.init({
+        blockId:"29779"
+      });
+
+    taskAd =
+      Adsgram.init({
+        blockId:"29780"
+      });
+
+    setTimeout(()=>{
+
+      document.getElementById(
+        "joinPopup"
+      ).style.display = "flex";
+
+    },3000);
+  }
+};
+
+/* REWARD */
+
+document.getElementById("rewardBtn")
+.onclick = async ()=>{
+
+  const r =
+    await rewardAd.show();
+
+  if(r?.done){
+
+    xp += 10;
+
+    await giveRefBonus(10);
+
+    await save();
+
+    updateUI();
+  }
+};
+
+/* TASK */
+
+document.getElementById("taskBtn")
+.onclick = async ()=>{
+
+  const r =
+    await taskAd.show();
+
+  if(r?.done){
+
+    xp += 10;
+
+    await giveRefBonus(10);
+
+    await save();
+
+    updateUI();
+  }
+};
+
+/* DAILY */
+
+const blocks = [
+  "task-29806",
+  "task-29807",
+  "task-29808",
+  "task-29809"
+];
+
+document.getElementById("dailyBtn")
+.onclick = async ()=>{
+
+  let now = Date.now();
+
+  if(
+    now - lastDaily < 86400000 &&
+    dailyProgress === 4
+  ){
+    return alert(
+      "Daily reward completed"
+    );
+  }
+
+  let block =
+    blocks[dailyProgress];
+
+  let task =
+    document.createElement(
+      "adsgram-task"
+    );
+
+  task.setAttribute(
+    "data-block-id",
+    block
+  );
+
+  document.body.appendChild(task);
+
+  task.addEventListener(
+    "reward",
+    async ()=>{
+
+      dailyProgress++;
+
+      if(dailyProgress === 4){
+
+        xp += 900;
+
+        await giveRefBonus(900);
+
+        lastDaily = now;
+
+        dailyProgress = 0;
+      }
+
+      await save();
+
+      updateUI();
+
+      task.remove();
+    }
+  );
+
+  task.load?.();
+};
+
+/* JOIN */
+
+document.getElementById("joinBtn")
+.onclick = async ()=>{
+
+  const snap =
+    await get(userRef());
+
+  const data =
+    snap.val() || {};
+
+  if(data.joinRewardClaimed){
+
+    window.open(
+      "https://t.me/CashGyana",
+      "_blank"
+    );
+
+    return;
+  }
+
+  xp += 5;
+
+  await update(userRef(),{
+
+    joinRewardClaimed:true,
+    xp:xp
+
+  });
+
+  await giveRefBonus(5);
+
   updateUI();
-  showJoinPopupAfterAds();
-});
+
+  document.getElementById(
+    "joinPopup"
+  ).style.display = "none";
+
+  window.open(
+    "https://t.me/CashGyana",
+    "_blank"
+  );
+};
+
+/* COPY */
+
+document.getElementById("copyBtn")
+.onclick = ()=>{
+
+  navigator.clipboard.writeText(
+
+    document.getElementById(
+      "refInput"
+    ).value
+
+  );
+
+  alert("Referral link copied");
+};
+
+/* WITHDRAW */
+
+document.getElementById(
+  "withdrawBtn"
+).onclick = async ()=>{
+
+  let amount =
+    parseInt(
+      document.getElementById(
+        "amount"
+      ).value
+    );
+
+  let wallet =
+    document.getElementById(
+      "wallet"
+    ).value;
+
+  let method =
+    document.getElementById(
+      "method"
+    ).value;
+
+  if(!amount || amount <= 0)
+    return alert(
+      "Enter valid amount"
+    );
+
+  if(amount < 10000)
+    return alert(
+      "Minimum 10,000 XP"
+    );
+
+  if(amount > xp)
+    return alert(
+      "Insufficient XP"
+    );
+
+  if(!wallet)
+    return alert(
+      "Enter wallet"
+    );
+
+  xp -= amount;
+
+  await save();
+
+  updateUI();
+
+  alert(
+    "Withdrawal request submitted"
+  );
+
+  console.log({
+    uid,
+    amount,
+    wallet,
+    method
+  });
+};
+
 </script>
 
 </body>
