@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +10,6 @@
 <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
 <style>
-
 *{
   margin:0;
   padding:0;
@@ -17,11 +17,10 @@
 }
 
 body{
-  background:
-  radial-gradient(circle at top,#19b84d,#063517 70%);
+  background:#07111f;
   color:white;
-  font-family:Arial,sans-serif;
-  padding:15px;
+  font-family:Arial, sans-serif;
+  padding:18px;
 }
 
 .header{
@@ -34,246 +33,225 @@ body{
 .logo{
   font-size:26px;
   font-weight:bold;
+  color:#00e0ff;
 }
 
 .level{
-  background:#0e5226;
-  padding:10px 16px;
-  border-radius:20px;
-}
-
-.wallet-bar{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:18px;
-}
-
-.wallet-card{
-  flex:1;
-  background:#0f4422;
-  padding:16px;
-  border-radius:18px;
-  text-align:center;
-}
-
-.wallet-card h3{
+  background:#132033;
+  padding:8px 14px;
+  border-radius:30px;
   font-size:14px;
-  margin-bottom:6px;
 }
 
-.wallet-card p{
-  font-size:22px;
-  font-weight:bold;
+.balance-box{
+  background:linear-gradient(135deg,#00e0ff,#0077ff);
+  border-radius:24px;
+  padding:30px 20px;
+  text-align:center;
+  color:#fff;
+  margin-bottom:20px;
+}
+
+.balance-box h2{
+  font-size:50px;
+  margin-top:10px;
+}
+
+.progress{
+  width:100%;
+  height:10px;
+  background:rgba(255,255,255,0.2);
+  border-radius:30px;
+  overflow:hidden;
+  margin-top:15px;
+}
+
+.progress div{
+  width:0%;
+  height:100%;
+  background:#fff;
 }
 
 .grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:14px;
-  margin-bottom:18px;
+  margin-bottom:20px;
 }
 
 .card{
-  background:#0d3c1d;
+  background:#101b2d;
   padding:18px;
   border-radius:20px;
+  border:1px solid #1f2d44;
 }
 
 .card h3{
+  font-size:16px;
   margin-bottom:10px;
 }
 
-.section{
-  background:#0d3c1d;
-  padding:18px;
-  border-radius:22px;
-  margin-bottom:18px;
+.card p{
+  font-size:13px;
+  opacity:0.8;
 }
 
 .btn{
   width:100%;
-  border:none;
   padding:14px;
-  border-radius:16px;
+  border:none;
+  border-radius:14px;
   margin-top:14px;
+  background:linear-gradient(45deg,#00e0ff,#0077ff);
+  color:white;
   font-weight:bold;
   cursor:pointer;
-  background:linear-gradient(45deg,#25ff74,#00c853);
-  color:#000;
-  font-size:15px;
 }
 
 .btn:active{
-  transform:scale(0.98);
+  transform:scale(0.96);
+}
+
+.section{
+  background:#101b2d;
+  padding:18px;
+  border-radius:20px;
+  margin-bottom:18px;
+  border:1px solid #1f2d44;
 }
 
 input,select{
   width:100%;
-  padding:13px;
+  padding:12px;
   border:none;
-  border-radius:14px;
-  background:#184d2a;
+  border-radius:12px;
+  background:#18263b;
   color:white;
-  margin-top:12px;
+  margin-top:10px;
 }
 
-#wheel{
-  width:270px;
-  height:270px;
-  border-radius:50%;
-  margin:20px auto;
-  position:relative;
-  border:10px solid #111;
-  background:
-    conic-gradient(
-      #ffcc00 0deg 45deg,
-      #00e0ff 45deg 90deg,
-      #ff4d6d 90deg 135deg,
-      #00c853 135deg 180deg,
-      #ff9100 180deg 225deg,
-      #aa00ff 225deg 270deg,
-      #00b0ff 270deg 315deg,
-      #ff1744 315deg 360deg
-    );
+/* DAILY PROGRESS BAR */
+#dailyProgressBar{
+  width:100%;
+  height:8px;
+  background:#1b2a40;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:10px;
 }
 
-.wheel-center{
-  position:absolute;
-  width:80px;
-  height:80px;
-  background:#111;
-  border-radius:50%;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  display:flex;
+#dailyProgressBar div{
+  height:100%;
+  width:0%;
+  background:#00e0ff;
+}
+
+/* JOIN POPUP */
+#joinPopup{
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  background:rgba(0,0,0,0.85);
+  display:none;
   justify-content:center;
   align-items:center;
+  flex-direction:column;
+  z-index:9999;
+  text-align:center;
+}
+
+#joinPopup button{
+  padding:14px 20px;
+  border:none;
+  border-radius:12px;
+  background:#00e0ff;
+  color:#000;
   font-weight:bold;
-  border:5px solid #fff;
 }
-
-.pointer{
-  width:0;
-  height:0;
-  border-left:15px solid transparent;
-  border-right:15px solid transparent;
-  border-top:30px solid white;
-  margin:auto;
-  margin-top:-10px;
-}
-
 </style>
 </head>
 
 <body>
 
 <div class="header">
-
-  <div class="logo">
-    ⚡ Tap & Earn X
-  </div>
-
+  <div class="logo">⚡ Tap & Earn X</div>
   <div class="level">
     Level <span id="level">1</span>
   </div>
-
 </div>
 
-<div class="wallet-bar">
+<div class="balance-box">
+  <p>Total XP</p>
 
-  <div class="wallet-card">
-    <h3>⚡ Energy</h3>
-    <p id="energy">0</p>
+  <h2 id="points">0</h2>
+
+  <div class="progress">
+    <div id="bar"></div>
   </div>
-
-  <div class="wallet-card">
-    <h3>💰 PV</h3>
-    <p id="points">0</p>
-  </div>
-
-  <div class="wallet-card">
-    <h3>👥 Referrals</h3>
-    <p id="refs">0</p>
-  </div>
-
 </div>
 
 <div class="grid">
 
   <div class="card">
-    <h3>🎡 Total Played</h3>
+    <h3>👆 Total Taps</h3>
     <p id="taps">0</p>
   </div>
 
   <div class="card">
-    <h3>🏆 Referral PV</h3>
-    <p id="refEarn">0</p>
+    <h3>🏆 Rank</h3>
+    <p>Starter</p>
   </div>
 
 </div>
 
 <div class="section">
+  <h2>🎮 Tap System</h2>
 
-  <h2>🎡 Spin & Earn</h2>
-
-  <div id="wheel">
-
-    <div class="wheel-center">
-      SPIN
-    </div>
-
-  </div>
-
-  <div class="pointer"></div>
-
-  <button class="btn" id="spinBtn">
-    Spin (-10 Energy)
+  <button class="btn" id="tapBtn">
+    Tap +1 XP
   </button>
-
 </div>
 
 <div class="section">
-
   <h2>📺 Reward Ad</h2>
 
   <button class="btn" id="rewardBtn">
-    Watch Ad +10 Energy
+    Watch Ad +10 XP
   </button>
-
 </div>
 
 <div class="section">
-
   <h2>🎯 Task Center</h2>
 
   <button class="btn" id="taskBtn">
-    Complete Task +10 Energy
+    Complete Task +10 XP
   </button>
-
 </div>
 
 <div class="section">
-
   <h2>🎁 Daily Reward</h2>
 
   <button class="btn" id="dailyBtn">
-    Claim +1000 Energy
+    Start Daily Bonus
   </button>
 
+  <div id="dailyProgressBar">
+    <div></div>
+  </div>
 </div>
 
 <div class="section">
-
   <h2>👥 Referral</h2>
 
-  <input id="refInput" readonly>
+  <input
+    id="refInput"
+    readonly
+    value="https://t.me/@Profitvablebot?start=12345"
+  >
 
   <button class="btn" id="copyBtn">
     Copy Referral Link
   </button>
-
 </div>
 
 <div class="section">
@@ -299,196 +277,86 @@ input,select{
   >
 
   <button class="btn" id="withdrawBtn">
-    Withdraw PV
+    Withdraw XP
+  </button>
+
+</div>
+
+<!-- JOIN POPUP -->
+
+<div id="joinPopup">
+
+  <h2 style="margin-bottom:15px;">
+    Join Our Channel
+  </h2>
+
+  <button id="joinBtn">
+    Join Channel +5 XP
   </button>
 
 </div>
 
 <script>
 
-const tg = window.Telegram?.WebApp;
+const tg =
+  window.Telegram?.WebApp;
 
 tg?.expand?.();
 
-/* CONFIG */
-
-const BOT_USERNAME = "@Reyersbot";
-
-/* USER */
-
-const user =
-  tg?.initDataUnsafe?.user || {};
-
-const uid =
-  user?.id?.toString() || "guest";
-
 /* STORAGE */
 
-const STORAGE_KEY =
-  "tapearnx_" + uid;
-
-/* STATE */
-
-let pv = 0;
-let taps = 0;
-let refs = 0;
-let energy = 0;
-let refEarn = 0;
-
-let dailyClaim = 0;
-
-/* LOAD */
-
-function loadData(){
-
-  const saved =
-    localStorage.getItem(STORAGE_KEY);
-
-  if(saved){
-
-    const d = JSON.parse(saved);
-
-    pv = d.pv || 0;
-
-    taps = d.taps || 0;
-
-    refs = d.refs || 0;
-
-    energy = d.energy || 0;
-
-    refEarn = d.refEarn || 0;
-
-    dailyClaim = d.dailyClaim || 0;
-  }
-
-  updateUI();
-}
-
-loadData();
-
-/* SAVE */
-
-function saveData(){
-
-  localStorage.setItem(
-
-    STORAGE_KEY,
-
-    JSON.stringify({
-
-      pv,
-      taps,
-      refs,
-      energy,
-      refEarn,
-      dailyClaim
-
-    })
+let xp =
+  parseInt(
+    localStorage.getItem('xp') || '0'
   );
-}
 
-/* UI */
+let taps =
+  parseInt(
+    localStorage.getItem('taps') || '0'
+  );
 
-function updateUI(){
+let lastDaily =
+  parseInt(
+    localStorage.getItem('daily') || '0'
+  );
 
-  document.getElementById("points")
-  .innerText = pv;
+/* DAILY BLOCK IDS */
 
-  document.getElementById("energy")
-  .innerText = energy;
+const DAILY_BLOCKS = [
+  "task-29806",
+  "task-29807",
+  "task-29808",
+  "task-29809"
+];
 
-  document.getElementById("taps")
+/* UPDATE UI */
+
+function update(){
+
+  document.getElementById('points')
+  .innerText = xp;
+
+  document.getElementById('taps')
   .innerText = taps;
 
-  document.getElementById("refs")
-  .innerText = refs;
+  let level =
+    Math.floor(xp / 500) + 1;
 
-  document.getElementById("refEarn")
-  .innerText = refEarn;
+  document.getElementById('level')
+  .innerText = level;
 
-  document.getElementById("level")
-  .innerText =
-    Math.floor(pv / 500) + 1;
+  let progress =
+    (xp % 500) / 500 * 100;
 
-  document.getElementById("refInput")
-  .value =
-  `https://t.me/${BOT_USERNAME}?start=${uid}`;
+  document.getElementById('bar')
+  .style.width = progress + '%';
+
+  localStorage.setItem('xp', xp);
+
+  localStorage.setItem('taps', taps);
 }
 
-/* SPIN */
-
-let spinning = false;
-let wheelRotation = 0;
-
-document.getElementById("spinBtn")
-.onclick = ()=>{
-
-  if(spinning)
-  return;
-
-  if(energy < 10){
-
-    return alert(
-      "Not enough energy"
-    );
-  }
-
-  spinning = true;
-
-  energy -= 10;
-
-  saveData();
-
-  updateUI();
-
-  const rewards =
-  [5,8,10,12,15,18,20,25,30];
-
-  const reward =
-    rewards[
-      Math.floor(
-        Math.random() *
-        rewards.length
-      )
-    ];
-
-  const extraRotation =
-    1440 +
-    Math.floor(
-      Math.random() * 360
-    );
-
-  wheelRotation += extraRotation;
-
-  const wheel =
-    document.getElementById("wheel");
-
-  wheel.style.transition =
-    "transform 4s cubic-bezier(0.17,0.67,0.18,1)";
-
-  wheel.style.transform =
-    `rotate(${wheelRotation}deg)`;
-
-  setTimeout(()=>{
-
-    pv += reward;
-
-    taps++;
-
-    saveData();
-
-    updateUI();
-
-    alert(
-      "🎉 You won " +
-      reward +
-      " PV"
-    );
-
-    spinning = false;
-
-  },4000);
-};
+update();
 
 /* ADSGRAM */
 
@@ -497,164 +365,273 @@ let taskAd;
 
 window.onload = ()=>{
 
-  if(typeof Adsgram !== "undefined"){
+  if(typeof Adsgram !== 'undefined'){
 
     rewardAd =
       Adsgram.init({
-        blockId:"34131"
+        blockId:'29779'
       });
 
     taskAd =
       Adsgram.init({
-        blockId:"34132"
+        blockId:'29780'
       });
+
+    /* PRELOAD */
+
+    let joinAd =
+      Adsgram.init({
+        blockId:'29780'
+      });
+
+    joinAd.show()
+    .finally(()=>{
+
+      document.getElementById(
+        "joinPopup"
+      ).style.display = "flex";
+
+    });
   }
+};
+
+/* TAP */
+
+document.getElementById('tapBtn')
+.onclick = ()=>{
+
+  xp += 1;
+
+  taps += 1;
+
+  update();
 };
 
 /* WATCH AD */
 
-document.getElementById("rewardBtn")
+document.getElementById('rewardBtn')
 .onclick = async ()=>{
 
   if(!rewardAd)
-  return;
+    return alert('Ad not ready');
 
-  const r =
-    await rewardAd.show();
+  try{
 
-  if(r?.done){
+    const res =
+      await rewardAd.show();
 
-    energy += 10;
+    if(res?.done){
 
-    saveData();
+      xp += 10;
 
-    updateUI();
+      update();
 
-    alert(
-      "+10 Energy"
-    );
-  }
+      alert(
+        'Reward Added'
+      );
+    }
+
+  }catch(e){}
 };
 
 /* TASK */
 
-document.getElementById("taskBtn")
+document.getElementById('taskBtn')
 .onclick = async ()=>{
 
   if(!taskAd)
-  return;
-
-  const r =
-    await taskAd.show();
-
-  if(r?.done){
-
-    energy += 10;
-
-    saveData();
-
-    updateUI();
-
-    alert(
-      "+10 Energy"
+    return alert(
+      'Task ad not ready'
     );
-  }
+
+  try{
+
+    const res =
+      await taskAd.show();
+
+    if(res?.done){
+
+      xp += 10;
+
+      update();
+
+      alert(
+        'Task Completed'
+      );
+    }
+
+  }catch(e){}
 };
 
-/* DAILY */
+/* DAILY BONUS */
 
-document.getElementById("dailyBtn")
-.onclick = ()=>{
+let dailyCompleted = false;
 
-  const now = Date.now();
+document.getElementById('dailyBtn')
+.onclick = async ()=>{
 
-  if(
-    now - dailyClaim <
-    86400000
-  ){
+  let now = Date.now();
+
+  /* 24 HOURS */
+
+  if(now - lastDaily < 86400000){
 
     return alert(
-      "Come back tomorrow"
+      'Come back tomorrow'
     );
   }
 
-  energy += 1000;
+  if(typeof Adsgram === 'undefined'){
 
-  dailyClaim = now;
+    return alert(
+      'Ads not ready'
+    );
+  }
 
-  saveData();
+  /* RANDOM TASK */
 
-  updateUI();
+  const randomBlock =
+    DAILY_BLOCKS[
+      Math.floor(
+        Math.random() *
+        DAILY_BLOCKS.length
+      )
+    ];
 
-  alert(
-    "+1000 Energy"
+  /* CREATE TASK */
+
+  let task =
+    document.createElement(
+      "adsgram-task"
+    );
+
+  task.setAttribute(
+    "data-block-id",
+    randomBlock
+  );
+
+  document
+    .getElementById('dailyBtn')
+    .parentNode
+    .appendChild(task);
+
+  /* REWARD */
+
+  task.addEventListener(
+    "reward",
+    ()=>{
+
+      if(dailyCompleted)
+      return;
+
+      dailyCompleted = true;
+
+      xp += 900;
+
+      lastDaily = now;
+
+      localStorage.setItem(
+        'daily',
+        now
+      );
+
+      update();
+
+      alert(
+        "🎉 Daily Bonus Claimed! +900 XP"
+      );
+
+      task.remove();
+
+      setTimeout(()=>{
+
+        dailyCompleted = false;
+
+      },1000);
+    }
+  );
+
+  /* LOAD TASK */
+
+  if(typeof task.load === "function"){
+
+    task.load();
+  }
+};
+
+/* JOIN CHANNEL */
+
+document.getElementById('joinBtn')
+.onclick = ()=>{
+
+  xp += 5;
+
+  update();
+
+  document.getElementById(
+    "joinPopup"
+  ).style.display = "none";
+
+  window.open(
+    "https://t.me/CashGyana",
+    "_blank"
   );
 };
 
-/* COPY */
+/* COPY REFERRAL */
 
-document.getElementById("copyBtn")
+document.getElementById('copyBtn')
 .onclick = ()=>{
 
-  navigator.clipboard.writeText(
-
+  let input =
     document.getElementById(
-      "refInput"
-    ).value
+      'refInput'
+    );
 
+  input.select();
+
+  document.execCommand(
+    'copy'
   );
 
-  alert(
-    "Referral link copied"
-  );
+  alert('Copied');
 };
 
 /* WITHDRAW */
 
 document.getElementById(
-  "withdrawBtn"
+  'withdrawBtn'
 ).onclick = ()=>{
 
   let amount =
     parseInt(
       document.getElementById(
-        "amount"
+        'amount'
       ).value
     );
 
-  let wallet =
-    document.getElementById(
-      "wallet"
-    ).value;
-
-  if(!amount || amount <= 0)
+  if(
+    !amount ||
+    amount < 10000
+  ){
     return alert(
-      "Enter valid amount"
+      'Minimum 10,000 XP'
     );
+  }
 
-  if(amount < 10000)
+  if(xp < amount){
+
     return alert(
-      "Minimum 10,000 PV"
+      'Not enough XP'
     );
+  }
 
-  if(amount > pv)
-    return alert(
-      "Insufficient PV"
-    );
+  xp -= amount;
 
-  if(!wallet)
-    return alert(
-      "Enter wallet"
-    );
-
-  pv -= amount;
-
-  saveData();
-
-  updateUI();
+  update();
 
   alert(
-    "Withdrawal request submitted"
+    'Withdraw Sent'
   );
 };
 
@@ -662,3 +639,4 @@ document.getElementById(
 
 </body>
 </html>
+```
