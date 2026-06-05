@@ -164,6 +164,21 @@ input,select{
   margin-top:-10px;
 }
 
+#dailyProgressBar{
+  width:100%;
+  height:8px;
+  background:#184d2a;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:12px;
+}
+
+#dailyProgressBar div{
+  width:0%;
+  height:100%;
+  background:#25ff74;
+}
+
 </style>
 </head>
 
@@ -262,6 +277,10 @@ input,select{
     Claim +1000 Energy
   </button>
 
+  <div id="dailyProgressBar">
+    <div></div>
+  </div>
+
 </div>
 
 <div class="section">
@@ -336,6 +355,14 @@ let energy = 0;
 let refEarn = 0;
 
 let dailyClaim = 0;
+let dailyProgress = 0;
+
+const DAILY_BLOCKS = [
+  "task-29806",
+  "task-29807",
+  "task-29808",
+  "task-29809"
+];
 
 /* LOAD */
 
@@ -359,6 +386,8 @@ function loadData(){
     refEarn = d.refEarn || 0;
 
     dailyClaim = d.dailyClaim || 0;
+
+    dailyProgress = d.dailyProgress || 0;
   }
 
   updateUI();
@@ -381,10 +410,24 @@ function saveData(){
       refs,
       energy,
       refEarn,
-      dailyClaim
+      dailyClaim,
+      dailyProgress
 
     })
   );
+}
+
+/* DAILY BAR */
+
+function updateDailyBar(){
+
+  const percent =
+    (dailyProgress / 4) * 100;
+
+  document.querySelector(
+    "#dailyProgressBar div"
+  ).style.width =
+    percent + "%";
 }
 
 /* UI */
@@ -413,6 +456,8 @@ function updateUI(){
   document.getElementById("refInput")
   .value =
   `https://t.me/${BOT_USERNAME}?start=${uid}`;
+
+  updateDailyBar();
 }
 
 /* SPIN */
@@ -564,7 +609,7 @@ document.getElementById("taskBtn")
 /* DAILY */
 
 document.getElementById("dailyBtn")
-.onclick = ()=>{
+.onclick = async ()=>{
 
   const now = Date.now();
 
@@ -572,23 +617,84 @@ document.getElementById("dailyBtn")
     now - dailyClaim <
     86400000
   ){
-
     return alert(
       "Come back tomorrow"
     );
   }
 
-  energy += 1000;
+  if(typeof Adsgram === "undefined"){
+    return alert(
+      "Ads not ready"
+    );
+  }
 
-  dailyClaim = now;
+  dailyProgress = 0;
 
   saveData();
 
   updateUI();
 
-  alert(
-    "+1000 Energy"
-  );
+  function startTask(index){
+
+    if(index >= 4){
+
+      energy += 1000;
+
+      dailyClaim = now;
+
+      dailyProgress = 0;
+
+      saveData();
+
+      updateUI();
+
+      return alert(
+        "🎉 Daily bonus completed! +1000 Energy"
+      );
+    }
+
+    let task =
+      document.createElement(
+        "adsgram-task"
+      );
+
+    task.setAttribute(
+      "data-block-id",
+      DAILY_BLOCKS[index]
+    );
+
+    document.getElementById(
+      "dailyBtn"
+    ).parentNode.appendChild(task);
+
+    task.addEventListener(
+      "reward",
+      ()=>{
+
+        dailyProgress++;
+
+        saveData();
+
+        updateUI();
+
+        task.remove();
+
+        alert(
+          "Task " +
+          dailyProgress +
+          "/4 completed"
+        );
+
+        startTask(index + 1);
+      }
+    );
+
+    if(typeof task.load === "function"){
+      task.load();
+    }
+  }
+
+  startTask(0);
 };
 
 /* COPY */
